@@ -1,0 +1,53 @@
+﻿@model Gradution_Project_G5.BLL.ViewModels.GradesVM.GradeCreateVM
+@{
+    ViewData["Title"] = "Create Grade";
+}
+
+<h1><i class="fas fa-plus-circle"></i> Create Grade</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label asp-for="SessionId" class="control-label">Session</label>
+                <select asp-for="SessionId" class="form-control" asp-items="ViewBag.Sessions">
+                    <option value="">Select Session</option>
+                </select>
+                <span asp-validation-for="SessionId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="TraineeId" class="control-label">Trainee</label>
+                <select asp-for="TraineeId" class="form-control" asp-items="ViewBag.Trainees">
+                    <option value="">Select Trainee</option>
+                </select>
+                <span asp-validation-for="TraineeId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Value" class="control-label">Grade Value (0-100)</label>
+                <input asp-for="Value" type="number" class="form-control" min="0" max="100" />
+                <span asp-validation-for="Value" class="text-danger"></span>
+                <small class="form-text text-muted">
+                    Grade scale: 85-100 (Excellent), 75-84 (Very Good), 50-74 (Good), 0-49 (Fail)
+                </small>
+            </div>
+
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> Create
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

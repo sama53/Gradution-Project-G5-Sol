@@ -1,0 +1,54 @@
+﻿
+@{
+    ViewData["Title"] = "Create User";
+}
+
+<h1><i class="fas fa-user-plus"></i> Create User</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" id="userForm">
+            @Html.AntiForgeryToken()
+
+            <partial name="_UserForm" model="Model" />
+
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> Create
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Remote validation for email
+        $('#userForm').validate({
+            rules: {
+                Email: {
+                    remote: {
+                        url: '@Url.Action("IsEmailUnique", "Users")',
+                        type: "post",
+                        data: {
+                            email: function() {
+                                return $('#Email').val();
+                            }
+                        }
+                    }
+                }
+            },
+            messages: {
+                Email: {
+                    remote: "Email already exists"
+                }
+            }
+        });
+    </script>
+}

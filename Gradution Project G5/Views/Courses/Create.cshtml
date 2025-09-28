@@ -1,0 +1,58 @@
+﻿@model Gradution_Project_G5.BLL.ViewModels.CoursesVM.CourseCreateVM
+@{
+    ViewData["Title"] = "Create Course";
+}
+
+<h1><i class="fas fa-plus-circle"></i> Create Course</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Create" id="courseForm">
+            @Html.AntiForgeryToken()
+
+            <partial name="_CourseForm" model="Model" />
+
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> Create
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Remote validation for course name
+        $.validator.addMethod('remote', function(value, element, param) {
+            return this.optional(element) || true;
+        });
+
+        $('#courseForm').validate({
+            rules: {
+                Name: {
+                    remote: {
+                        url: '@Url.Action("IsCourseNameUnique", "Courses")',
+                        type: "post",
+                        data: {
+                            name: function() {
+                                return $('#Name').val();
+                            }
+                        }
+                    }
+                }
+            },
+            messages: {
+                Name: {
+                    remote: "Course name already exists"
+                }
+            }
+        });
+    </script>
+}

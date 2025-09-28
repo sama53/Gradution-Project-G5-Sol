@@ -1,0 +1,38 @@
+﻿@model Gradution_Project_G5.BLL.ViewModels.GradesVM.GradeEditVM
+@{
+    ViewData["Title"] = "Edit Grade";
+}
+
+<h1><i class="fas fa-edit"></i> Edit Grade</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-group">
+                <label asp-for="Value" class="control-label">Grade Value (0-100)</label>
+                <input asp-for="Value" type="number" class="form-control" min="0" max="100" />
+                <span asp-validation-for="Value" class="text-danger"></span>
+                <small class="form-text text-muted">
+                    Grade scale: 85-100 (Excellent), 75-84 (Very Good), 50-74 (Good), 0-49 (Fail)
+                </small>
+            </div>
+
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-warning">
+                    <i class="fas fa-save"></i> Update
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

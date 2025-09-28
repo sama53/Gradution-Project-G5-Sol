@@ -1,0 +1,55 @@
+﻿@model Gradution_Project_G5.BLL.ViewModels.UsersVM.UserEditVM
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<h1><i class="fas fa-user-edit"></i> Edit User</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit" id="userForm">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+
+            <partial name="_UserEditForm" model="Model" />
+
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-warning">
+                    <i class="fas fa-save"></i> Update
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $('#userForm').validate({
+            rules: {
+                Email: {
+                    remote: {
+                        url: '@Url.Action("IsEmailUnique", "Users")',
+                        type: "post",
+                        data: {
+                            email: function() {
+                                return $('#Email').val();
+                            },
+                            id: '@Model.Id'
+                        }
+                    }
+                }
+            },
+            messages: {
+                Email: {
+                    remote: "Email already exists"
+                }
+            }
+        });
+    </script>
+}

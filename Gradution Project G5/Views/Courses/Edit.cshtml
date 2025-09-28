@@ -1,0 +1,56 @@
+﻿@model Gradution_Project_G5.BLL.ViewModels.CoursesVM.CourseEditVM
+@{
+    ViewData["Title"] = "Edit Course";
+}
+
+<h1><i class="fas fa-edit"></i> Edit Course</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+
+            <partial name="_CourseEditForm" model="Model" />
+
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-warning">
+                    <i class="fas fa-save"></i> Update
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+       
+        $('form').validate({
+            rules: {
+                Name: {
+                    remote: {
+                        url: '@Url.Action("IsCourseNameUnique", "Courses")',
+                        type: "post",
+                        data: {
+                            name: function() {
+                                return $('#Name').val();
+                            },
+                            id: '@Model.Id'
+                        }
+                    }
+                }
+            },
+            messages: {
+                Name: {
+                    remote: "Course name already exists"
+                }
+            }
+        });
+    </script>
+}

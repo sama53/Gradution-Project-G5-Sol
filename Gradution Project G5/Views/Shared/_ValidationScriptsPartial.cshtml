@@ -1,0 +1,53 @@
+﻿<script src="https://cdnjs.cloudflare.com/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+
+<script>
+    // Custom validation for FutureDate
+    $.validator.addMethod("futuredate", function(value, element) {
+        if (!value) return true;
+        var selectedDate = new Date(value);
+        var today = new Date();
+        return selectedDate >= today;
+    });
+
+    // Custom validation for DateAfter
+    $.validator.addMethod("dateafter", function(value, element, param) {
+        if (!value) return true;
+        var endDate = new Date(value);
+        var startDate = new Date($(param).val());
+        return endDate > startDate;
+    });
+
+    // Custom validation for NoNumbers
+    $.validator.addMethod("nonumber", function(value, element) {
+        if (!value) return true;
+        return !/\d/.test(value);
+    });
+
+    // Custom validation for NoSpecialCharacters
+    $.validator.addMethod("nospecialchars", function(value, element) {
+        if (!value) return true;
+        return !/[^a-zA-Z0-9\s\-_]/.test(value);
+    });
+
+    // Register adapters for unobtrusive validation
+    $.validator.unobtrusive.adapters.add("futuredate", [], function(options) {
+        options.rules["futuredate"] = true;
+        options.messages["futuredate"] = options.message;
+    });
+
+    $.validator.unobtrusive.adapters.add("dateafter", ["comparisonproperty"], function(options) {
+        options.rules["dateafter"] = "#" + options.params.comparisonproperty;
+        options.messages["dateafter"] = options.message;
+    });
+
+    $.validator.unobtrusive.adapters.add("nonumber", [], function(options) {
+        options.rules["nonumber"] = true;
+        options.messages["nonumber"] = options.message;
+    });
+
+    $.validator.unobtrusive.adapters.add("nospecialchars", [], function(options) {
+        options.rules["nospecialchars"] = true;
+        options.messages["nospecialchars"] = options.message;
+    });
+</script>
