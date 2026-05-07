@@ -7,7 +7,7 @@ namespace Gradution_Project_G5.BLL.ViewModels.CoursesVM
     public class CourseCreateVM
     {
         [Required(ErrorMessage = "Course name is required")]
-        [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters")]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = "Name must be between 2 and 50 characters")]
         [NoNumber(ErrorMessage = "Course name cannot contain numbers")]
         [NoSpecialCharacters(ErrorMessage = "Course name cannot contain special characters")]
         public string Name { get; set; } = string.Empty;
@@ -19,6 +19,6 @@ namespace Gradution_Project_G5.BLL.ViewModels.CoursesVM
         [Required(ErrorMessage = "Category is required")]
         public Categories Category { get; set; }
 
-        public int InstructorId { get; set; }
+        public int? InstructorId { get; set; }
     }
 }

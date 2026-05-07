@@ -21,6 +21,11 @@ namespace Gradution_Project_G5.DAL.Repositories
                 })
                 .ToListAsync();
         }
+        public async Task<bool> IsEmailUniqueAsync(string email, int? excludeId = null)
+        {
+            var instructors = await GetAllAsync();
+            return !instructors.Any(i => i.Email == email && i.Id != excludeId);
+        }
 
-          }
+    }
 }

@@ -3,21 +3,164 @@
     ViewData["Title"] = "Create Course";
 }
 
-<h1><i class="fas fa-plus-circle"></i> Create Course</h1>
-<hr />
+<style>
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --primary-light: #eff6ff;
+        --success: #10b981;
+        --success-dark: #059669;
+        --border: #e2e8f0;
+        --text: #0f172a;
+        --text-muted: #64748b;
+        --surface: #ffffff;
+        --radius: 14px;
+        --radius-sm: 8px;
+        --shadow-md: 0 4px 24px rgba(0,0,0,0.08);
+    }
 
-<div class="row">
-    <div class="col-md-8">
+    .page-wrapper {
+        max-width: 720px;
+        margin: 2.5rem auto;
+        padding: 0 1.5rem;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 2px solid var(--border);
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        letter-spacing: -0.5px;
+    }
+
+        .page-title i {
+            color: var(--success);
+        }
+
+    .form-card {
+        background: var(--surface);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border);
+        padding: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.65rem 1rem;
+        border: 2px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-size: 0.95rem;
+        color: var(--text);
+        transition: all 0.2s;
+        background: #f8fafc;
+        box-sizing: border-box;
+    }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+
+    .form-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, var(--success), var(--success-dark));
+        color: white;
+        border: none;
+        padding: 0.7rem 1.8rem;
+        border-radius: var(--radius-sm);
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+        transition: all 0.2s;
+    }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16,185,129,0.4);
+        }
+
+    .btn-back {
+        background: transparent;
+        color: var(--text-muted);
+        border: 2px solid var(--border);
+        padding: 0.7rem 1.4rem;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+        .btn-back:hover {
+            border-color: var(--text-muted);
+            color: var(--text);
+            transform: translateY(-1px);
+        }
+
+    .text-danger {
+        color: #ef4444;
+        font-size: 0.82rem;
+        margin-top: 0.3rem;
+        display: block;
+    }
+</style>
+
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-plus-circle"></i> Create Course
+        </h1>
+    </div>
+
+    <div class="form-card">
         <form asp-action="Create" id="courseForm">
             @Html.AntiForgeryToken()
-
             <partial name="_CourseForm" model="Model" />
 
-            <div class="form-group mt-3">
-                <button type="submit" class="btn btn-success">
-                    <i class="fas fa-save"></i> Create
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-save"></i> Create Course
                 </button>
-                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                <a asp-action="Index" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
             </div>
         </form>
     </div>
@@ -27,32 +170,18 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
     <script>
-        // Remote validation for course name
-        $.validator.addMethod('remote', function(value, element, param) {
-            return this.optional(element) || true;
-        });
-
         $('#courseForm').validate({
             rules: {
                 Name: {
                     remote: {
                         url: '@Url.Action("IsCourseNameUnique", "Courses")',
                         type: "post",
-                        data: {
-                            name: function() {
-                                return $('#Name').val();
-                            }
-                        }
+                        data: { name: function() { return $('#Name').val(); } }
                     }
                 }
             },
-            messages: {
-                Name: {
-                    remote: "Course name already exists"
-                }
-            }
+            messages: { Name: { remote: "Course name already exists" } }
         });
     </script>
 }

@@ -17,8 +17,6 @@ namespace Gradution_Project_G5.DAL.Models
         public UserRole Role { get; set; }
 
         public bool IsActive { get; set; } = true;
-
-        public ICollection<Course> Courses { get; set; } = new List<Course>();
         public ICollection<Grade> Grades { get; set; } = new List<Grade>();
     }
 }

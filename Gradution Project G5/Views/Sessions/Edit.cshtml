@@ -3,61 +3,80 @@
     ViewData["Title"] = "Edit Session";
 }
 
-<h1><i class="fas fa-edit"></i> Edit Session</h1>
-<hr />
+<style>
+    :root {
+        --primary: #2563eb; --primary-dark: #1d4ed8;
+        --accent: #f59e0b; --accent-dark: #d97706;
+        --border: #e2e8f0; --text: #0f172a; --text-muted: #64748b;
+        --surface: #ffffff; --radius: 14px; --radius-sm: 8px;
+        --shadow-md: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .page-wrapper { max-width: 780px; margin: 2.5rem auto; padding: 0 1.5rem; font-family: 'Segoe UI', system-ui, sans-serif; }
+    .page-header { margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 2px solid var(--border); }
+    .page-title { font-size: 1.8rem; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 0.75rem; }
+    .page-title i { color: var(--accent); }
+    .form-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-md); border: 1px solid var(--border); padding: 2rem; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .form-group { margin-bottom: 1.25rem; }
+    .form-label { display: block; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; font-size: 0.9rem; }
+    .form-control { width: 100%; padding: 0.65rem 1rem; border: 2px solid var(--border); border-radius: var(--radius-sm); font-size: 0.95rem; color: var(--text); transition: all 0.2s; background: #f8fafc; box-sizing: border-box; }
+    .form-control:focus { outline: none; border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .text-danger { color: #ef4444; font-size: 0.82rem; margin-top: 0.3rem; display: block; }
+    .section-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+    .form-actions { display: flex; gap: 0.75rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+    .btn-submit { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: white; border: none; padding: 0.7rem 1.8rem; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 12px rgba(245,158,11,0.3); transition: all 0.2s; }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,158,11,0.4); }
+    .btn-back { background: transparent; color: var(--text-muted); border: 2px solid var(--border); padding: 0.7rem 1.4rem; border-radius: var(--radius-sm); font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s; }
+    .btn-back:hover { border-color: var(--text-muted); color: var(--text); transform: translateY(-1px); }
+</style>
 
-<div class="row">
-    <div class="col-md-8">
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1 class="page-title"><i class="fas fa-edit"></i> Edit Session</h1>
+    </div>
+
+    <div class="form-card">
         <form asp-action="Edit">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Id" />
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label asp-for="Title" class="control-label"></label>
-                        <input asp-for="Title" class="form-control" />
-                        <span asp-validation-for="Title" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label asp-for="CourseId" class="control-label">Course</label>
-                        <select asp-for="CourseId" class="form-control" asp-items="ViewBag.Courses">
-                            <option value="">Select Course</option>
-                        </select>
-                        <span asp-validation-for="CourseId" class="text-danger"></span>
-                    </div>
+            <p class="section-label">Session Info</p>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label asp-for="Title" class="form-label">Title</label>
+                    <input asp-for="Title" class="form-control" placeholder="Enter session title..." />
+                    <span asp-validation-for="Title" class="text-danger"></span>
                 </div>
 
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label asp-for="StartDate" class="control-label"></label>
-                        <input asp-for="StartDate" type="datetime-local" class="form-control"
-                               value="@Model.StartDate.ToString("yyyy-MM-ddTHH:mm")" />
-                        <span asp-validation-for="StartDate" class="text-danger"></span>
-                    </div>
+                <div class="form-group">
+                    <label asp-for="CourseId" class="form-label">Course</label>
+                    <select asp-for="CourseId" class="form-control" asp-items="ViewBag.Courses">
+                        <option value="">Select Course</option>
+                    </select>
+                    <span asp-validation-for="CourseId" class="text-danger"></span>
+                </div>
 
-                    <div class="form-group">
-                        <label asp-for="EndDate" class="control-label"></label>
-                        <input asp-for="EndDate" type="datetime-local" class="form-control"
-                               value="@Model.EndDate.ToString("yyyy-MM-ddTHH:mm")" />
-                        <span asp-validation-for="EndDate" class="text-danger"></span>
-                    </div>
+                <div class="form-group">
+                    <label asp-for="StartDate" class="form-label">Start Date & Time</label>
+                    <input asp-for="StartDate" type="datetime-local" class="form-control" />
+                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="EndDate" class="form-label">End Date & Time</label>
+                    <input asp-for="EndDate" type="datetime-local" class="form-control" />
+                    <span asp-validation-for="EndDate" class="text-danger"></span>
                 </div>
             </div>
 
-            <div class="form-group mt-3">
-                <button type="submit" class="btn btn-warning">
-                    <i class="fas fa-save"></i> Update
-                </button>
-                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            <div class="form-actions">
+                <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Update Session</button>
+                <a asp-action="Index" class="btn-back"><i class="fas fa-arrow-left"></i> Back to List</a>
             </div>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

@@ -16,7 +16,7 @@ namespace Gradution_Project_G5.UI.Controllers
         }
 
         // GET: Users
-        public async Task<IActionResult> Index(string searchTerm, string role, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> Index(string searchTerm, string role, int page = 1, int pageSize = 5)
         {
             ViewBag.CurrentFilter = searchTerm;
             ViewBag.CurrentRole = role;
@@ -92,22 +92,44 @@ namespace Gradution_Project_G5.UI.Controllers
         }
 
         // GET: Users/Edit/5
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id, bool isInstructor = false)
         {
-            var result = await _userService.GetUserByIdAsync(id);
-            if (!result.Success)
-            {
-                TempData["Error"] = result.Message;
-                return RedirectToAction(nameof(Index));
-            }
+            UserEditVM editVM;
 
-            var editVM = new UserEditVM
+            if (isInstructor)
             {
-                Id = result.Data.Id,
-                Name = result.Data.Name,
-                Email = result.Data.Email,
-                Role = result.Data.Role
-            };
+                var result = await _userService.GetInstructorAsUserAsync(id);
+                if (!result.Success)
+                {
+                    TempData["Error"] = result.Message;
+                    return RedirectToAction(nameof(Index));
+                }
+                editVM = new UserEditVM
+                {
+                    Id = result.Data.Id,
+                    Name = result.Data.Name,
+                    Email = result.Data.Email,
+                    Role = result.Data.Role,
+                    IsInstructor = true
+                };
+            }
+            else
+            {
+                var result = await _userService.GetUserByIdAsync(id);
+                if (!result.Success)
+                {
+                    TempData["Error"] = result.Message;
+                    return RedirectToAction(nameof(Index));
+                }
+                editVM = new UserEditVM
+                {
+                    Id = result.Data.Id,
+                    Name = result.Data.Name,
+                    Email = result.Data.Email,
+                    Role = result.Data.Role,
+                    IsInstructor = false
+                };
+            }
 
             ViewBag.Roles = GetRoleSelectList();
             return View(editVM);
@@ -142,17 +164,16 @@ namespace Gradution_Project_G5.UI.Controllers
         // POST: Users/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id, bool isInstructor = false)
         {
-            var result = await _userService.DeleteUserAsync(id);
+            var result = isInstructor
+                ? await _userService.DeleteInstructorAsync(id)
+                : await _userService.DeleteUserAsync(id);
+
             if (result.Success)
-            {
                 TempData["Success"] = "User deleted successfully";
-            }
             else
-            {
                 TempData["Error"] = result.Message;
-            }
 
             return RedirectToAction(nameof(Index));
         }
@@ -162,7 +183,13 @@ namespace Gradution_Project_G5.UI.Controllers
         public async Task<IActionResult> IsEmailUnique(string email, int id = 0)
         {
             var result = await _userService.IsEmailUniqueAsync(email, id == 0 ? null : id);
-            return Json(result.Success ? true : $"Email '{email}' is already in use.");
+
+            if (!result.Success)
+                return Json($"An error occurred while validating email.");
+
+            return result.Data
+                ? Json(true)
+                : Json($"Email '{email}' is already in use.");
         }
 
         private List<SelectListItem> GetRoleSelectList()

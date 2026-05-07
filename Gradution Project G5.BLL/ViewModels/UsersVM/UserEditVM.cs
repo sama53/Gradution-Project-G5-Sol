@@ -7,6 +7,7 @@ namespace Gradution_Project_G5.BLL.ViewModels.UsersVM
     public class UserEditVM
     {
         public int Id { get; set; }
+        public bool IsInstructor { get; set; } = false;
 
         [Required(ErrorMessage = "Name is required")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters")]

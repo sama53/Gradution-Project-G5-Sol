@@ -3,89 +3,142 @@
     ViewData["Title"] = "Sessions";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="fas fa-calendar-alt"></i> Sessions</h1>
-    <a asp-action="Create" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Create New
-    </a>
-</div>
+<style>
+    :root {
+        --primary: #2563eb; --primary-dark: #1d4ed8; --primary-light: #eff6ff;
+        --accent: #f59e0b; --accent-dark: #d97706;
+        --danger: #ef4444; --danger-dark: #dc2626;
+        --info: #06b6d4; --info-dark: #0891b2;
+        --success: #10b981;
+        --border: #e2e8f0; --text: #0f172a; --text-muted: #64748b;
+        --surface: #ffffff; --radius: 14px; --radius-sm: 8px;
+        --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .page-wrapper { max-width: 1200px; margin: 0 auto; padding: 2.5rem 1.5rem; font-family: 'Segoe UI', system-ui, sans-serif; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 2px solid var(--border); }
+    .page-title { font-size: 2rem; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 0.75rem; letter-spacing: -0.5px; }
+    .page-title i { color: var(--primary); }
+    .btn-create { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; padding: 0.65rem 1.5rem; border-radius: var(--radius-sm); font-weight: 600; display: flex; align-items: center; gap: 0.5rem; text-decoration: none; box-shadow: 0 4px 12px rgba(37,99,235,0.3); transition: all 0.2s ease; }
+    .btn-create:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,99,235,0.4); color: white; }
+    .search-bar { display: flex; gap: 0.5rem; margin-bottom: 2rem; background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); padding: 0.4rem 0.4rem 0.4rem 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); transition: border-color 0.2s; }
+    .search-bar:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .search-bar input { border: none; outline: none; flex: 1; font-size: 0.95rem; color: var(--text); background: transparent; }
+    .search-bar input::placeholder { color: var(--text-muted); }
+    .btn-search { background: var(--primary); color: white; border: none; padding: 0.5rem 1.2rem; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; transition: all 0.2s; }
+    .btn-search:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn-clear { background: transparent; color: var(--danger); border: 2px solid var(--danger); padding: 0.5rem 1rem; border-radius: var(--radius-sm); font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 0.4rem; transition: all 0.2s; }
+    .btn-clear:hover { background: var(--danger); color: white; transform: translateY(-1px); }
+    .table-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-md); overflow: hidden; border: 1px solid var(--border); }
+    .sessions-table { width: 100%; border-collapse: collapse; }
+    .sessions-table thead { background: linear-gradient(135deg, #1e293b, #0f172a); }
+    .sessions-table thead th { padding: 1rem 1.25rem; color: #94a3b8; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; border: none; }
+    .sessions-table thead th:first-child { color: white; }
+    .sessions-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    .sessions-table tbody tr:last-child { border-bottom: none; }
+    .sessions-table tbody tr:hover { background: var(--primary-light); }
+    .sessions-table tbody td { padding: 1rem 1.25rem; color: var(--text); font-size: 0.95rem; vertical-align: middle; }
+    .session-title { font-weight: 700; }
+    .course-chip { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--primary-light); color: var(--primary); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.82rem; font-weight: 600; }
+    .date-cell { display: flex; flex-direction: column; gap: 0.1rem; }
+    .date-main { font-weight: 600; font-size: 0.9rem; }
+    .date-time { color: var(--text-muted); font-size: 0.78rem; }
+    .duration-badge { display: inline-flex; align-items: center; gap: 0.3rem; background: #f0fdf4; color: var(--success); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.82rem; font-weight: 700; }
+    .actions-cell { display: flex; gap: 0.4rem; align-items: center; }
+    .btn-action { width: 36px; height: 36px; border-radius: var(--radius-sm); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.85rem; text-decoration: none; transition: all 0.2s ease; }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    .btn-view { background: linear-gradient(135deg, var(--info), var(--info-dark)); color: white; }
+    .btn-edit { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: white; }
+    .btn-delete { background: linear-gradient(135deg, var(--danger), var(--danger-dark)); color: white; }
+    .empty-state { text-align: center; padding: 4rem 2rem; background: var(--surface); border-radius: var(--radius); border: 2px dashed var(--border); }
+    .empty-state i { font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem; display: block; }
+    .empty-state p { color: var(--text-muted); font-size: 1.05rem; margin: 0; }
+    .pagination-wrapper { display: flex; justify-content: center; margin-top: 1.5rem; gap: 0.3rem; }
+    .page-btn { width: 38px; height: 38px; border-radius: var(--radius-sm); border: 2px solid var(--border); background: var(--surface); color: var(--text); font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: all 0.2s; font-size: 0.9rem; }
+    .page-btn:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-1px); }
+    .page-btn.active { background: var(--primary); border-color: var(--primary); color: white; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+</style>
 
-<!-- Search Form -->
-<form asp-action="Index" method="get" class="mb-4">
-    <div class="input-group">
-        <input type="text" class="form-control" name="searchTerm" value="@ViewBag.CurrentFilter"
-               placeholder="Search by title.">
-        <button class="btn btn-outline-secondary" type="submit">
-            <i class="fas fa-search"></i> Search
-        </button>
-        <a asp-action="Index" class="btn btn-outline-danger">Clear</a>
-    </div>
-</form>
-
-@if (Model != null && Model.Items != null && Model.Items.Any())
-{
-    <div class="table-responsive">
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>Title</th>
-                    <th>Course</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <th>Duration (Hours)</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Items)
-                {
-                    <tr>
-                        <td>@item.Title</td>
-                        <td>@item.CourseName</td>
-                        <td>@item.StartDate.ToString("dd/MM/yyyy HH:mm")</td>
-                        <td>@item.EndDate.ToString("dd/MM/yyyy HH:mm")</td>
-                        <td>@item.Duration.ToString("F1")</td>
-                        <td class="table-actions">
-                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <form asp-action="Delete" method="post" class="d-inline">
-                                <input type="hidden" name="id" value="@item.Id" />
-                                <button type="submit" class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Are you sure you want to delete this session?')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1 class="page-title"><i class="fas fa-calendar-alt"></i> Sessions</h1>
+        <a asp-action="Create" class="btn-create"><i class="fas fa-plus"></i> Create New</a>
     </div>
 
-    <!-- Pagination -->
-    @if (Model.TotalPages > 1)
+    <form asp-action="Index" method="get">
+        <div class="search-bar">
+            <i class="fas fa-search" style="color:var(--text-muted);align-self:center;"></i>
+            <input type="text" name="searchTerm" value="@ViewBag.CurrentFilter" placeholder="Search by title..." />
+            <button class="btn-search" type="submit"><i class="fas fa-search"></i> Search</button>
+            <a asp-action="Index" class="btn-clear"><i class="fas fa-times"></i> Clear</a>
+        </div>
+    </form>
+
+    @if (Model != null && Model.Items != null && Model.Items.Any())
     {
-        <nav>
-            <ul class="pagination">
+        <div class="table-card">
+            <table class="sessions-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Course</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Duration</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td><span class="session-title">@item.Title</span></td>
+                            <td><span class="course-chip"><i class="fas fa-book"></i> @item.CourseName</span></td>
+                            <td>
+                                <div class="date-cell">
+                                    <span class="date-main">@item.StartDate.ToString("dd/MM/yyyy")</span>
+                                    <span class="date-time">@item.StartDate.ToString("HH:mm")</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="date-cell">
+                                    <span class="date-main">@item.EndDate.ToString("dd/MM/yyyy")</span>
+                                    <span class="date-time">@item.EndDate.ToString("HH:mm")</span>
+                                </div>
+                            </td>
+                            <td><span class="duration-badge"><i class="fas fa-clock"></i> @item.Duration.ToString("F1")h</span></td>
+                            <td>
+                                <div class="actions-cell">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn-action btn-view" title="View"><i class="fas fa-eye"></i></a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn-action btn-edit" title="Edit"><i class="fas fa-edit"></i></a>
+                                    <form asp-action="Delete" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn-action btn-delete" title="Delete" onclick="return confirm('Are you sure you want to delete this session?')"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <div class="pagination-wrapper">
                 @for (int i = 1; i <= Model.TotalPages; i++)
                 {
-                    <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                        <a class="page-link" href="@Url.Action("Index", new { page = i, pageSize = Model.PageSize })">
-                            @i
-                        </a>
-                    </li>
+                    <a class="page-btn @(i == Model.PageNumber ? "active" : "")"
+                       href="@Url.Action("Index", new { page = i, pageSize = Model.PageSize, searchTerm = ViewBag.CurrentFilter })">@i</a>
                 }
-            </ul>
-        </nav>
+            </div>
+        }
     }
-}
-else
-{
-    <div class="alert alert-warning text-center">
-        <i class="fas fa-exclamation-triangle"></i> No sessions found.
-    </div>
-}
+    else
+    {
+        <div class="empty-state">
+            <i class="fas fa-calendar-times"></i>
+            <p>No sessions found.</p>
+        </div>
+    }
+</div>

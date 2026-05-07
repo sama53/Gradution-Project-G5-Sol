@@ -13,7 +13,7 @@ namespace Gradution_Project_G5.BLL.ViewModels.CoursesVM
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Course name is required")]
-        [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters")]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = "Name must be between 2 and 50 characters")]
         public string Name { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Description is required")]
@@ -31,6 +31,6 @@ namespace Gradution_Project_G5.BLL.ViewModels.CoursesVM
         [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
 
-        public int InstructorId { get; set; }
+        public int? InstructorId { get; set; }
     }
 }

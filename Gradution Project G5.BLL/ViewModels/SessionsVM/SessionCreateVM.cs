@@ -1,4 +1,5 @@
 ﻿using Gradution_Project_G5.BLL.Validation;
+using Gradution_Project_G5.DAL.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace Gradution_Project_G5.BLL.ViewModels.SessionsVM
@@ -18,6 +19,7 @@ namespace Gradution_Project_G5.BLL.ViewModels.SessionsVM
         [DataType(DataType.DateTime)]
         [FutureDate(ErrorMessage = "End date cannot be in the past")]
         [DateAfter("StartDate", ErrorMessage = "End date must be after start date")]
+        [MinDuration(ErrorMessage = "Session duration must be at least 1 hour.")]
         public DateTime EndDate { get; set; }
 
         [Required(ErrorMessage = "Course is required")]

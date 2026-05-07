@@ -1,54 +1,49 @@
-﻿
+﻿@model Gradution_Project_G5.BLL.ViewModels.UsersVM.UserCreateVM
 @{
     ViewData["Title"] = "Create User";
 }
 
-<h1><i class="fas fa-user-plus"></i> Create User</h1>
-<hr />
+<style>
+    :root {
+        --success: #10b981; --success-dark: #059669;
+        --border: #e2e8f0; --text: #0f172a; --text-muted: #64748b;
+        --surface: #ffffff; --radius: 14px; --radius-sm: 8px;
+        --shadow-md: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .page-wrapper { max-width: 720px; margin: 2.5rem auto; padding: 0 1.5rem; font-family: 'Segoe UI', system-ui, sans-serif; }
+    .page-header { margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 2px solid var(--border); }
+    .page-title { font-size: 1.8rem; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 0.75rem; }
+    .page-title i { color: var(--success); }
+    .form-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-md); border: 1px solid var(--border); padding: 2rem; }
+    .form-actions { display: flex; gap: 0.75rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+    .btn-submit { background: linear-gradient(135deg, var(--success), var(--success-dark)); color: white; border: none; padding: 0.7rem 1.8rem; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 12px rgba(16,185,129,0.3); transition: all 0.2s; }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16,185,129,0.4); }
+    .btn-back { background: transparent; color: var(--text-muted); border: 2px solid var(--border); padding: 0.7rem 1.4rem; border-radius: var(--radius-sm); font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s; }
+    .btn-back:hover { border-color: var(--text-muted); color: var(--text); transform: translateY(-1px); }
+</style>
 
-<div class="row">
-    <div class="col-md-6">
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1 class="page-title"><i class="fas fa-user-plus"></i> Create User</h1>
+    </div>
+    <div class="form-card">
         <form asp-action="Create" id="userForm">
             @Html.AntiForgeryToken()
-
             <partial name="_UserForm" model="Model" />
-
-            <div class="form-group mt-3">
-                <button type="submit" class="btn btn-success">
-                    <i class="fas fa-save"></i> Create
-                </button>
-                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            <div class="form-actions">
+                <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Create User</button>
+                <a asp-action="Index" class="btn-back"><i class="fas fa-arrow-left"></i> Back to List</a>
             </div>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
     <script>
-        // Remote validation for email
         $('#userForm').validate({
-            rules: {
-                Email: {
-                    remote: {
-                        url: '@Url.Action("IsEmailUnique", "Users")',
-                        type: "post",
-                        data: {
-                            email: function() {
-                                return $('#Email').val();
-                            }
-                        }
-                    }
-                }
-            },
-            messages: {
-                Email: {
-                    remote: "Email already exists"
-                }
-            }
+            rules: { Email: { remote: { url: '@Url.Action("IsEmailUnique", "Users")', type: "post", data: { email: function() { return $('#Email').val(); } } } } },
+            messages: { Email: { remote: "Email already exists" } }
         });
     </script>
 }

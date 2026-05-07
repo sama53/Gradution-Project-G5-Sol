@@ -23,7 +23,7 @@ namespace Gradution_Project_G5.BLL.Services
         {
             try
             {
-                var course = await _unitOfWork.Courses.GetByIdAsync(id);
+                var course = await _unitOfWork.Courses.GetByIdWithIncludesAsync(id);
                 if (course == null)
                     return ResultHelper.Failure<CourseVM>("Course not found"); 
 
@@ -37,11 +37,11 @@ namespace Gradution_Project_G5.BLL.Services
             }
         }
 
-        public async Task<Result<PagedResult<CourseVM>>> GetAllCoursesAsync(int page = 1, int pageSize = 10)
+        public async Task<Result<PagedResult<CourseVM>>> GetAllCoursesAsync(int page = 1, int pageSize = 5)
         {
             try
             {
-                var courses = await _unitOfWork.Courses.GetAllAsync();
+                var courses = await _unitOfWork.Courses.GetAllWithIncludesAsync();
                 var totalCount = courses.Count();
 
                 var pagedCourses = courses
@@ -66,11 +66,11 @@ namespace Gradution_Project_G5.BLL.Services
             }
         }
 
-        public async Task<Result<PagedResult<CourseVM>>> SearchCoursesAsync(string searchTerm, int page = 1, int pageSize = 10)
+        public async Task<Result<PagedResult<CourseVM>>> SearchCoursesAsync(string searchTerm, int page = 1, int pageSize = 5)
         {
             try
             {
-                var allCourses = await _unitOfWork.Courses.GetAllAsync();
+                var allCourses = await _unitOfWork.Courses.GetAllWithIncludesAsync();
                 var filteredCourses = allCourses
                     .Where(c => c.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                                c.Category.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
@@ -134,7 +134,7 @@ namespace Gradution_Project_G5.BLL.Services
         {
             try
             {
-                var course = await _unitOfWork.Courses.GetByIdAsync(id);
+                var course = await _unitOfWork.Courses.GetByIdWithIncludesAsync(id);
                 if (course == null)
                     return ResultHelper.Failure<CourseVM>("Course not found"); 
 

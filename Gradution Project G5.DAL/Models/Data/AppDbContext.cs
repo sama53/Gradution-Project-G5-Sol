@@ -1,6 +1,7 @@
 ﻿using Gradution_Project_G5.DAL.Entities;
 using Gradution_Project_G5.DAL.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Gradution_Project_G5.DAL.Models.Data
 {
@@ -42,10 +43,11 @@ namespace Gradution_Project_G5.DAL.Models.Data
 
             // Course-Instructor relationship
             modelBuilder.Entity<Course>()
-                .HasOne(c => c.Instructor)
-                .WithMany(i => i.Courses)
-                .HasForeignKey(c => c.InstructorId)
-                .OnDelete(DeleteBehavior.Restrict);
+    .HasOne(c => c.Instructor)
+    .WithMany(i => i.Courses)
+    .HasForeignKey(c => c.InstructorId)
+    .IsRequired(false)
+    .OnDelete(DeleteBehavior.Restrict);
 
             // Session-Course relationship
             modelBuilder.Entity<Session>()

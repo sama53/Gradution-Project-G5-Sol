@@ -3,112 +3,182 @@
     ViewData["Title"] = "Grades";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="fas fa-chart-bar"></i> Grades</h1>
-    <a asp-action="Create" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Create New
-    </a>
-</div>
+<style>
+    :root {
+        --primary: #2563eb; --primary-dark: #1d4ed8; --primary-light: #eff6ff;
+        --accent: #f59e0b; --accent-dark: #d97706;
+        --danger: #ef4444; --danger-dark: #dc2626;
+        --info: #06b6d4; --info-dark: #0891b2;
+        --success: #10b981; --success-dark: #059669;
+        --border: #e2e8f0; --text: #0f172a; --text-muted: #64748b;
+        --surface: #ffffff; --radius: 14px; --radius-sm: 8px;
+        --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .page-wrapper { max-width: 1200px; margin: 0 auto; padding: 2.5rem 1.5rem; font-family: 'Segoe UI', system-ui, sans-serif; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 2px solid var(--border); }
+    .page-title { font-size: 2rem; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 0.75rem; letter-spacing: -0.5px; }
+    .page-title i { color: var(--primary); }
+    .btn-create { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; padding: 0.65rem 1.5rem; border-radius: var(--radius-sm); font-weight: 600; display: flex; align-items: center; gap: 0.5rem; text-decoration: none; box-shadow: 0 4px 12px rgba(37,99,235,0.3); transition: all 0.2s ease; }
+    .btn-create:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,99,235,0.4); color: white; }
 
-<!-- Filter Form -->
-<form asp-action="Index" method="get" class="mb-4">
-    <div class="row">
-        <div class="col-md-4">
-            <select name="sessionId" class="form-control" asp-items="ViewBag.Sessions">
-                <option value="">Filter by Session</option>
-            </select>
-        </div>
-        <div class="col-md-4">
-            <select name="traineeId" class="form-control" asp-items="ViewBag.Trainees">
-                <option value="">Filter by Trainee</option>
-            </select>
-        </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-outline-secondary w-100">
-                <i class="fas fa-filter"></i> Filter
-            </button>
-        </div>
-        <div class="col-md-2">
-            <a asp-action="Index" class="btn btn-outline-danger w-100">Clear</a>
-        </div>
-    </div>
-</form>
+    /* Filter Section */
+    .filter-card { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; }
+    .filter-group { display: flex; flex-direction: column; gap: 0.4rem; flex: 1; min-width: 180px; }
+    .filter-label { font-weight: 600; color: var(--text-muted); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 0.3rem; }
+    .filter-select { padding: 0.55rem 1rem; border: 2px solid var(--border); border-radius: var(--radius-sm); font-size: 0.92rem; color: var(--text); background: #f8fafc; transition: all 0.2s; outline: none; }
+    .filter-select:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .btn-filter { background: var(--primary); color: white; border: none; padding: 0.58rem 1.3rem; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; transition: all 0.2s; white-space: nowrap; }
+    .btn-filter:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn-clear { background: transparent; color: var(--danger); border: 2px solid var(--danger); padding: 0.55rem 1.1rem; border-radius: var(--radius-sm); font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 0.4rem; transition: all 0.2s; white-space: nowrap; }
+    .btn-clear:hover { background: var(--danger); color: white; transform: translateY(-1px); }
 
-@if (Model.Items.Any())
-{
-    <div class="table-responsive">
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>Trainee</th>
-                    <th>Session</th>
-                    <th>Course</th>
-                    <th>Grade</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Items)
-                {
-                    <tr>
-                        <td>@item.TraineeName</td>
-                        <td>@item.SessionTitle</td>
-                        <td>@item.CourseName</td>
-                        <td>
-                            <span class="badge
-                                        @(item.Value >= 85 ? "bg-success" :
-                                                                    item.Value >= 75 ? "bg-info" :
-                                                                    item.Value >= 50 ? "bg-warning" : "bg-danger")">
-                        @item.Value
-                    </span>
-                </td>
-                <td>
-                    <span class="badge @(item.Value >= 50 ? "bg-success" : "bg-danger")">
-                        @(item.Value >= 50 ? "Pass" : "Fail")
-                    </span>
-                </td>
-                <td class="table-actions">
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <form asp-action="Delete" method="post" class="d-inline">
-                        <input type="hidden" name="id" value="@item.Id" />
-                        <button type="submit" class="btn btn-danger btn-sm"
-                                onclick="return confirm('Are you sure you want to delete this grade?')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </form>
-                </td>
-            </tr>
-                        }
-            </tbody>
-        </table>
+    /* Table */
+    .table-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-md); overflow: hidden; border: 1px solid var(--border); }
+    .grades-table { width: 100%; border-collapse: collapse; }
+    .grades-table thead { background: linear-gradient(135deg, #1e293b, #0f172a); }
+    .grades-table thead th { padding: 1rem 1.25rem; color: #94a3b8; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; border: none; }
+    .grades-table thead th:first-child { color: white; }
+    .grades-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    .grades-table tbody tr:last-child { border-bottom: none; }
+    .grades-table tbody tr:hover { background: var(--primary-light); }
+    .grades-table tbody td { padding: 1rem 1.25rem; color: var(--text); font-size: 0.95rem; vertical-align: middle; }
+
+    /* Avatar */
+    .trainee-cell { display: flex; align-items: center; gap: 0.65rem; }
+    .avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #4f46e5, #7c3aed); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+
+    /* Grade Badge */
+    .badge-grade { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 28px; border-radius: 999px; font-size: 0.82rem; font-weight: 800; }
+    .grade-excellent { background: #dcfce7; color: #16a34a; }
+    .grade-verygood { background: #e0f2fe; color: #0369a1; }
+    .grade-good { background: #fef3c7; color: #d97706; }
+    .grade-fail { background: #fee2e2; color: #dc2626; }
+
+    .badge-status { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.78rem; font-weight: 700; }
+    .status-pass { background: #dcfce7; color: #16a34a; }
+    .status-fail { background: #fee2e2; color: #dc2626; }
+
+    /* Actions */
+    .actions-cell { display: flex; gap: 0.4rem; align-items: center; }
+    .btn-action { width: 36px; height: 36px; border-radius: var(--radius-sm); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.85rem; text-decoration: none; transition: all 0.2s ease; }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    .btn-view { background: linear-gradient(135deg, var(--info), var(--info-dark)); color: white; }
+    .btn-edit { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: white; }
+    .btn-delete { background: linear-gradient(135deg, var(--danger), var(--danger-dark)); color: white; }
+
+    /* Empty */
+    .empty-state { text-align: center; padding: 4rem 2rem; background: var(--surface); border-radius: var(--radius); border: 2px dashed var(--border); }
+    .empty-state i { font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem; display: block; }
+    .empty-state p { color: var(--text-muted); font-size: 1.05rem; margin: 0 0 1.5rem; }
+
+    /* Pagination */
+    .pagination-wrapper { display: flex; justify-content: center; margin-top: 1.5rem; gap: 0.3rem; }
+    .page-btn { width: 38px; height: 38px; border-radius: var(--radius-sm); border: 2px solid var(--border); background: var(--surface); color: var(--text); font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: all 0.2s; font-size: 0.9rem; }
+    .page-btn:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-1px); }
+    .page-btn.active { background: var(--primary); border-color: var(--primary); color: white; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+</style>
+
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1 class="page-title"><i class="fas fa-chart-bar"></i> Grades</h1>
+        <a asp-action="Create" class="btn-create"><i class="fas fa-plus"></i> Create New</a>
     </div>
 
-    <!-- Pagination -->
-    @if (Model.TotalPages > 1)
+    <!-- Filter -->
+    <form asp-action="Index" method="get">
+        <div class="filter-card">
+            <div class="filter-group">
+                <label class="filter-label"><i class="fas fa-chalkboard"></i> Filter by Session</label>
+                <select name="sessionId" class="filter-select" 
+        asp-items="ViewBag.Sessions"
+        asp-selected-value="@ViewBag.SessionId">
+    <option value="">All Sessions</option>
+</select>       
+            </div>
+            <div class="filter-group">
+                <label class="filter-label"><i class="fas fa-user"></i> Filter by Trainee</label>
+                <select name="traineeId" class="filter-select" 
+        asp-items="ViewBag.Trainees"
+        asp-selected-value="@ViewBag.TraineeId">
+    <option value="">All Trainees</option>
+</select>
+            </div>
+            <button type="submit" class="btn-filter"><i class="fas fa-filter"></i> Filter</button>
+            <a asp-action="Index" class="btn-clear"><i class="fas fa-times"></i> Clear</a>
+        </div>
+    </form>
+
+    @if (Model.Items.Any())
     {
-        <nav>
-            <ul class="pagination">
+        <div class="table-card">
+            <table class="grades-table">
+                <thead>
+                    <tr>
+                        <th>Trainee</th>
+                        <th>Session</th>
+                        <th>Course</th>
+                        <th>Grade</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                <div class="trainee-cell">
+                                    <div class="avatar">@item.TraineeName.Substring(0, 1)</div>
+                                    <span style="font-weight:600;">@item.TraineeName</span>
+                                </div>
+                            </td>
+                            <td>@item.SessionTitle</td>
+                            <td>@item.CourseName</td>
+                            <td>
+                                <span class="badge-grade @(item.Value >= 85 ? "grade-excellent" : item.Value >= 75 ? "grade-verygood" : item.Value >= 50 ? "grade-good" : "grade-fail")">
+                                    @item.Value
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge-status @(item.Value >= 50 ? "status-pass" : "status-fail")">
+                                    <i class="fas @(item.Value >= 50 ? "fa-check" : "fa-times")"></i>
+                                    @(item.Value >= 50 ? "Pass" : "Fail")
+                                </span>
+                            </td>
+                            <td>
+                                <div class="actions-cell">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn-action btn-view" title="View"><i class="fas fa-eye"></i></a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn-action btn-edit" title="Edit"><i class="fas fa-edit"></i></a>
+                                    <form asp-action="Delete" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn-action btn-delete" title="Delete" onclick="return confirm('Delete this grade?')"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <div class="pagination-wrapper">
                 @for (int i = 1; i <= Model.TotalPages; i++)
                 {
-                    <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                        <a class="page-link" href="@Url.Action("Index", new { page = i, pageSize = Model.PageSize, sessionId = ViewBag.SessionId, traineeId = ViewBag.TraineeId })">
-                            @i
-                        </a>
-                    </li>
+                    <a class="page-btn @(i == Model.PageNumber ? "active" : "")"
+                       href="@Url.Action("Index", new { page = i, pageSize = Model.PageSize, sessionId = ViewBag.SessionId, traineeId = ViewBag.TraineeId })">@i</a>
                 }
-            </ul>
-        </nav>
+            </div>
+        }
     }
-}
-else
-{
-    <div class="alert alert-warning text-center">
-        <i class="fas fa-exclamation-triangle"></i> No grades found.
-    </div>
-}
+    else
+    {
+        <div class="empty-state">
+            <i class="fas fa-graduation-cap"></i>
+            <p>No grades found. Start by creating a new grade record.</p>
+            <a asp-action="Create" class="btn-create" style="display:inline-flex;margin:0 auto;"><i class="fas fa-plus"></i> Create Grade</a>
+        </div>
+    }
+</div>

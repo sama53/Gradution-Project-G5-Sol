@@ -3,75 +3,255 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Gradution Project G5</title>
+    <title>@ViewData["Title"] - Course Academy</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .navbar-brand { font-weight: bold; }
-        .table-actions { white-space: nowrap; }
-        .pagination { justify-content: center; }
-        .alert { margin-bottom: 1rem; }
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f1f5f9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+        }
+
+        /* ===== NAVBAR ===== */
+        .main-navbar {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+        }
+
+        .navbar-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .navbar-brand-link {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+            color: white;
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .brand-text { color: white; }
+        .brand-text span { color: #60a5fa; }
+
+        .navbar-links {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar-links a {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 0.9rem;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .navbar-links a:hover {
+            color: white;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .navbar-links a.active {
+            color: white;
+            background: rgba(37,99,235,0.5);
+        }
+
+        .navbar-links a i { font-size: 0.82rem; opacity: 0.8; }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* ===== ALERTS ===== */
+        .alert-toast {
+            border-radius: 12px;
+            border: none;
+            padding: 0.9rem 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .alert-toast.success {
+            background: #f0fdf4;
+            color: #166534;
+            border-left: 4px solid #16a34a;
+        }
+
+        .alert-toast.error {
+            background: #fef2f2;
+            color: #991b1b;
+            border-left: 4px solid #dc2626;
+        }
+
+        .alert-toast i { font-size: 1.1rem; flex-shrink: 0; }
+
+        .alert-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: inherit;
+            opacity: 0.6;
+            padding: 0;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+        }
+
+        .alert-close:hover { opacity: 1; }
+
+        /* ===== FOOTER ===== */
+        .main-footer {
+            background: #1e293b;
+            color: rgba(255,255,255,0.5);
+            padding: 1.25rem 1.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+            margin-top: auto;
+        }
+
+        .main-footer a {
+            color: #60a5fa;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .main-footer a:hover { color: #93c5fd; }
+
+        /* ===== MOBILE TOGGLE ===== */
+        .navbar-toggle {
+            display: none;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        @@media (max-width: 768px) {
+            .navbar-toggle { display: flex; }
+            .navbar-links {
+                display: none;
+                position: absolute;
+                top: 64px;
+                left: 0;
+                right: 0;
+                background: #1e293b;
+                flex-direction: column;
+                padding: 1rem;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+                gap: 0.25rem;
+            }
+            .navbar-links.open { display: flex; }
+            .navbar-links a { width: 100%; }
+        }
     </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="fas fa-graduation-cap"></i> Gradution Project G5
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-light" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-light" asp-controller="Courses" asp-action="Index">Courses</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-light" asp-controller="Sessions" asp-action="Index">Sessions</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-light" asp-controller="Users" asp-action="Index">Users</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-light" asp-controller="Grades" asp-action="Index">Grades</a>
-                        </li>
-                    </ul>
-                </div>
+
+    <!-- Navbar -->
+    <nav class="main-navbar">
+        <div class="navbar-inner">
+            <a class="navbar-brand-link" asp-controller="Home" asp-action="Index">
+                <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+                <span class="brand-text">Course <span>Academy</span></span>
+            </a>
+
+            <button class="navbar-toggle" onclick="document.querySelector('.navbar-links').classList.toggle('open')">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <ul class="navbar-links">
+                <li><a asp-controller="Home" asp-action="Index"><i class="fas fa-home"></i> Home</a></li>
+                <li><a asp-controller="Courses" asp-action="Index"><i class="fas fa-book"></i> Courses</a></li>
+                <li><a asp-controller="Sessions" asp-action="Index"><i class="fas fa-calendar-alt"></i> Sessions</a></li>
+                <li><a asp-controller="Users" asp-action="Index"><i class="fas fa-users"></i> Users</a></li>
+                <li><a asp-controller="Grades" asp-action="Index"><i class="fas fa-chart-bar"></i> Grades</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert-toast success">
+                <i class="fas fa-check-circle"></i>
+                <span>@TempData["Success"]</span>
+                <button class="alert-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
             </div>
-        </nav>
-    </header>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert-toast error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>@TempData["Error"]</span>
+                <button class="alert-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+            </div>
+        }
 
-    <div class="container">
-        <main role="main" class="pb-3">
-            <!-- Display TempData Messages -->
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle"></i> @TempData["Success"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            }
-            @if (TempData["Error"] != null)
-            {
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            }
-
-            @RenderBody()
-        </main>
+        @RenderBody()
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - Gradution Project G5 - <a asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
+    <!-- Footer -->
+    <footer class="main-footer">
+        &copy; 2026 - Course Academy &mdash;
+        <a asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

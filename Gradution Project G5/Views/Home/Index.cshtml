@@ -1,73 +1,95 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@* ===== Home/Index.cshtml ===== *@
+@{
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4 mb-4">Welcome to Gradution Project G5</h1>
-    <p class="lead">A comprehensive Course Management System built with ASP.NET Core MVC</p>
+<style>
+    .home-wrapper { font-family: 'Segoe UI', system-ui, sans-serif; }
 
-    <div class="row mt-5">
-        <div class="col-md-3 mb-4">
-            <div class="card text-white bg-primary">
-                <div class="card-body">
-                    <i class="fas fa-book fa-3x mb-3"></i>
-                    <h5 class="card-title">Courses</h5>
-                    <p class="card-text">Manage your courses and assign instructors</p>
-                    <a asp-controller="Courses" asp-action="Index" class="btn btn-light">View Courses</a>
-                </div>
-            </div>
-        </div>
+    /* Hero */
+    .hero { text-align: center; padding: 3.5rem 1.5rem 2.5rem; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: #eff6ff; color: #2563eb; padding: 0.4rem 1rem; border-radius: 999px; font-size: 0.82rem; font-weight: 700; margin-bottom: 1.25rem; letter-spacing: 0.3px; }
+    .hero h1 { font-size: 2.5rem; font-weight: 900; color: #0f172a; margin-bottom: 1rem; letter-spacing: -1px; line-height: 1.15; }
+    .hero h1 span { background: linear-gradient(135deg, #2563eb, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero p { color: #64748b; font-size: 1.1rem; max-width: 520px; margin: 0 auto 2.5rem; line-height: 1.6; }
 
-        <div class="col-md-3 mb-4">
-            <div class="card text-white bg-success">
-                <div class="card-body">
-                    <i class="fas fa-calendar-alt fa-3x mb-3"></i>
-                    <h5 class="card-title">Sessions</h5>
-                    <p class="card-text">Schedule and manage course sessions</p>
-                    <a asp-controller="Sessions" asp-action="Index" class="btn btn-light">View Sessions</a>
-                </div>
-            </div>
-        </div>
+    /* Cards Grid */
+    .cards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-bottom: 3rem; }
+    @@media (max-width: 900px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
+    @@media (max-width: 500px) { .cards-grid { grid-template-columns: 1fr; } .hero h1 { font-size: 1.8rem; } }
 
-        <div class="col-md-3 mb-4">
-            <div class="card text-white bg-warning">
-                <div class="card-body">
-                    <i class="fas fa-users fa-3x mb-3"></i>
-                    <h5 class="card-title">Users</h5>
-                    <p class="card-text">Manage users with different roles</p>
-                    <a asp-controller="Users" asp-action="Index" class="btn btn-light">View Users</a>
-                </div>
-            </div>
-        </div>
+    .nav-card { background: white; border-radius: 16px; padding: 1.75rem 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-align: center; text-decoration: none; transition: all 0.25s ease; display: flex; flex-direction: column; align-items: center; gap: 0.75rem; }
+    .nav-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.12); border-color: transparent; }
+    .card-icon { width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 0.25rem; }
+    .card-title { font-weight: 800; color: #0f172a; font-size: 1rem; margin: 0; }
+    .card-desc { color: #64748b; font-size: 0.82rem; margin: 0; line-height: 1.4; }
 
-        <div class="col-md-3 mb-4">
-            <div class="card text-white bg-info">
-                <div class="card-body">
-                    <i class="fas fa-chart-bar fa-3x mb-3"></i>
-                    <h5 class="card-title">Grades</h5>
-                    <p class="card-text">Track and manage student grades</p>
-                    <a asp-controller="Grades" asp-action="Index" class="btn btn-light">View Grades</a>
-                </div>
-            </div>
-        </div>
+    .icon-blue { background: #eff6ff; color: #2563eb; }
+    .icon-green { background: #f0fdf4; color: #16a34a; }
+    .icon-amber { background: #fffbeb; color: #d97706; }
+    .icon-cyan { background: #ecfeff; color: #0891b2; }
+
+    .nav-card:hover .icon-blue { background: #2563eb; color: white; }
+    .nav-card:hover .icon-green { background: #16a34a; color: white; }
+    .nav-card:hover .icon-amber { background: #d97706; color: white; }
+    .nav-card:hover .icon-cyan { background: #0891b2; color: white; }
+
+    /* Features */
+    .features-section { background: white; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
+    .features-header { background: linear-gradient(135deg, #1e293b, #0f172a); padding: 1.25rem 1.75rem; display: flex; align-items: center; gap: 0.75rem; }
+    .features-header i { color: #60a5fa; font-size: 1.1rem; }
+    .features-header h2 { color: white; font-size: 1rem; font-weight: 700; margin: 0; }
+    .features-list { display: grid; grid-template-columns: 1fr 1fr; }
+    @@media (max-width: 600px) { .features-list { grid-template-columns: 1fr; } }
+    .feature-item { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.75rem; border-bottom: 1px solid #f1f5f9; transition: background 0.15s; }
+    .feature-item:hover { background: #f8fafc; }
+    .feature-item:nth-last-child(-n+2) { border-bottom: none; }
+    .feature-dot { width: 8px; height: 8px; border-radius: 50%; background: #2563eb; flex-shrink: 0; }
+    .feature-item span { color: #374151; font-size: 0.92rem; font-weight: 500; }
+</style>
+
+<div class="home-wrapper">
+    <div class="hero">
+        <div class="hero-badge"><i class="fas fa-graduation-cap"></i> Course Management System</div>
+        <h1>Welcome to <span>Course Academy</span> System</h1>
+        <p>A comprehensive platform for managing courses, sessions, users, and grades.</p>
     </div>
 
-    <div class="row mt-5">
-        <div class="col-md-6 offset-md-3">
-            <div class="card">
-                <div class="card-header bg-dark text-white">
-                    <h5><i class="fas fa-cogs"></i> System Features</h5>
-                </div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Three-Tier Architecture</li>
-                        <li class="list-group-item">Repository Pattern & Unit of Work</li>
-                        <li class="list-group-item">Client & Server Side Validation</li>
-                        <li class="list-group-item">Pagination & Search</li>
-                        <li class="list-group-item">Responsive UI with Bootstrap</li>
-                    </ul>
-                </div>
-            </div>
+    <div class="cards-grid">
+        <a asp-controller="Courses" asp-action="Index" class="nav-card">
+            <div class="card-icon icon-blue"><i class="fas fa-book"></i></div>
+            <p class="card-title">Courses</p>
+            <p class="card-desc">Manage courses and assign instructors</p>
+        </a>
+        <a asp-controller="Sessions" asp-action="Index" class="nav-card">
+            <div class="card-icon icon-green"><i class="fas fa-calendar-alt"></i></div>
+            <p class="card-title">Sessions</p>
+            <p class="card-desc">Schedule and manage course sessions</p>
+        </a>
+        <a asp-controller="Users" asp-action="Index" class="nav-card">
+            <div class="card-icon icon-amber"><i class="fas fa-users"></i></div>
+            <p class="card-title">Users</p>
+            <p class="card-desc">Manage users with different roles</p>
+        </a>
+        <a asp-controller="Grades" asp-action="Index" class="nav-card">
+            <div class="card-icon icon-cyan"><i class="fas fa-chart-bar"></i></div>
+            <p class="card-title">Grades</p>
+            <p class="card-desc">Track and manage student grades</p>
+        </a>
+    </div>
+
+    <div class="features-section">
+        <div class="features-header">
+            <i class="fas fa-cogs"></i>
+            <h2>System Features</h2>
+        </div>
+        <div class="features-list">
+            <div class="feature-item"><div class="feature-dot"></div><span>Three-Tier Architecture</span></div>
+            <div class="feature-item"><div class="feature-dot"></div><span>Repository Pattern & Unit of Work</span></div>
+            <div class="feature-item"><div class="feature-dot"></div><span>Client & Server Side Validation</span></div>
+            <div class="feature-item"><div class="feature-dot"></div><span>Pagination & Search</span></div>
+            <div class="feature-item"><div class="feature-dot"></div><span>Responsive UI with Bootstrap</span></div>
+            <div class="feature-item"><div class="feature-dot"></div><span>Entity Framework Core</span></div>
         </div>
     </div>
 </div>

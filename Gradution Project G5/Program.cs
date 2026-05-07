@@ -5,12 +5,14 @@ using Gradution_Project_G5.DAL.Models.Data;
 using Gradution_Project_G5.DAL.Repositories;
 using Gradution_Project_G5.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")).ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning)));
 
 // Add Repositories
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

@@ -30,21 +30,31 @@ namespace Gradution_Project_G5.UI.Controllers
 
             if (sessionId.HasValue && traineeId.HasValue)
             {
-                var gradesResult = await _gradeService.GetGradesBySessionAsync(sessionId.Value, page, pageSize);
-                result = new Result<PagedResult<GradeVM>>
+   
+                var gradesResult = await _gradeService.GetGradesBySessionAsync(sessionId.Value, 1, int.MaxValue);
+
+                if (gradesResult.Success)
                 {
-                    Success = gradesResult.Success,
-                    Data = gradesResult.Success
-                        ? new PagedResult<GradeVM>
+                    var filtered = gradesResult.Data.Items
+                        .Where(g => g.TraineeId == traineeId.Value)
+                        .ToList();
+
+                    result = new Result<PagedResult<GradeVM>>
+                    {
+                        Success = true,
+                        Data = new PagedResult<GradeVM>
                         {
-                            Items = gradesResult.Data.Items.Where(g => g.TraineeId == traineeId.Value),
-                            TotalCount = gradesResult.Data.Items.Count(g => g.TraineeId == traineeId.Value),
+                            Items = filtered.Skip((page - 1) * pageSize).Take(pageSize), 
+                            TotalCount = filtered.Count,
                             PageNumber = page,
                             PageSize = pageSize
                         }
-                        : new PagedResult<GradeVM>(),
-                    Message = gradesResult.Message
-                };
+                    };
+                }
+                else
+                {
+                    result = new Result<PagedResult<GradeVM>> { Success = false, Message = gradesResult.Message };
+                }
             }
             else if (sessionId.HasValue)
             {
@@ -65,7 +75,7 @@ namespace Gradution_Project_G5.UI.Controllers
                 return View(new PagedResult<GradeVM>());
             }
 
-            await LoadViewData();
+            await LoadViewData(sessionId, traineeId); 
             return View(result.Data);
         }
 
@@ -172,17 +182,17 @@ namespace Gradution_Project_G5.UI.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private async Task LoadViewData()
+        private async Task LoadViewData(int? selectedSessionId = null, int? selectedTraineeId = null)
         {
             var sessionsResult = await _sessionService.GetAllSessionsAsync(1, 1000);
             var traineesResult = await _userService.GetUsersByRoleAsync("Trainee", 1, 1000);
 
             ViewBag.Sessions = sessionsResult.Success
-                ? new SelectList(sessionsResult.Data.Items, "Id", "Title")
+                ? new SelectList(sessionsResult.Data.Items, "Id", "Title", selectedSessionId) 
                 : new SelectList(new List<string>());
 
             ViewBag.Trainees = traineesResult.Success
-                ? new SelectList(traineesResult.Data.Items, "Id", "Name")
+                ? new SelectList(traineesResult.Data.Items, "Id", "Name", selectedTraineeId)   
                 : new SelectList(new List<string>());
         }
     }

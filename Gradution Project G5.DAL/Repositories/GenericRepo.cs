@@ -28,7 +28,5 @@ namespace Gradution_Project_G5.DAL.Repositories
         public void Update(T entity) => _dbSet.Update(entity);
 
         public void Delete(T entity) => _dbSet.Remove(entity);
-
-       
     }
 }

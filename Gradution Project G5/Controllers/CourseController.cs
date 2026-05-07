@@ -18,18 +18,13 @@ namespace Gradution_Project_G5.UI.Controllers
         }
 
         // GET: Courses
-        public async Task<IActionResult> Index(string searchTerm, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> Index(string searchTerm, int page = 1, int pageSize = 5)
         {
             ViewBag.CurrentFilter = searchTerm;
 
             var result = string.IsNullOrEmpty(searchTerm)
                 ? await _courseService.GetAllCoursesAsync(page, pageSize)
                 : await _courseService.SearchCoursesAsync(searchTerm, page, pageSize);
-
-            foreach(var course in result.Data.Items)
-            {
-                course.InstructorName = (await _instructorService.GetInstructorById(course.InstructorId)).Data.FirstName;
-            }
 
             if (!result.Success)
             {
@@ -45,8 +40,6 @@ namespace Gradution_Project_G5.UI.Controllers
         {
             var result = await _courseService.GetCourseByIdAsync(id);
 
-            result.Data.InstructorName = (await _instructorService.GetInstructorById(result.Data.InstructorId)).Data.FirstName;
-
             if (!result.Success)
             {
                 TempData["Error"] = result.Message;
@@ -54,6 +47,7 @@ namespace Gradution_Project_G5.UI.Controllers
             }
 
             return View(result.Data);
+
         }
 
         // GET: Courses/Create

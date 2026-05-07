@@ -1,29 +1,36 @@
-﻿
+﻿@* ===== _UserForm.cshtml ===== *@
 @using Gradution_Project_G5.BLL.ViewModels.UsersVM
-@model UserCreateVM 
-<div class="row">
-    <div class="col-md-6">
-        <div class="form-group">
-            <label asp-for="Name" class="control-label"></label>
-            <input asp-for="Name" class="form-control" />
-            <span asp-validation-for="Name" class="text-danger"></span>
-        </div>
+@model UserCreateVM
 
-        <div class="form-group">
-            <label asp-for="Email" class="control-label"></label>
-            <input asp-for="Email" class="form-control" />
-            <span asp-validation-for="Email" class="text-danger"></span>
-        </div>
+<style>
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .form-group { margin-bottom: 0; }
+    .form-label { display: block; font-weight: 600; color: #0f172a; margin-bottom: 0.5rem; font-size: 0.9rem; }
+    .form-control { width: 100%; padding: 0.65rem 1rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; color: #0f172a; transition: all 0.2s; background: #f8fafc; box-sizing: border-box; }
+    .form-control:focus { outline: none; border-color: #2563eb; background: white; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .text-danger { color: #ef4444; font-size: 0.82rem; margin-top: 0.3rem; display: block; }
+    @@media (max-width: 600px) { .form-grid-2 { grid-template-columns: 1fr; } }
+</style>
+
+<div class="form-grid-2">
+    <div class="form-group">
+        <label asp-for="Name" class="form-label">Full Name</label>
+        <input asp-for="Name" class="form-control" placeholder="Enter full name..." />
+        <span asp-validation-for="Name" class="text-danger"></span>
     </div>
 
-    <div class="col-md-6">
-        <div class="form-group">
-            <label asp-for="Role" class="control-label"></label>
-            <select asp-for="Role" class="form-control"
-                    asp-items="Html.GetEnumSelectList<Gradution_Project_G5.DAL.Models.UserRole>()">
-                <option value="">Select Role</option>
-            </select>
-            <span asp-validation-for="Role" class="text-danger"></span>
-        </div>
+    <div class="form-group">
+        <label asp-for="Role" class="form-label">Role</label>
+        <select asp-for="Role" class="form-control"
+                asp-items="Html.GetEnumSelectList<Gradution_Project_G5.DAL.Models.UserRole>()">
+            <option value="">Select Role</option>
+        </select>
+        <span asp-validation-for="Role" class="text-danger"></span>
+    </div>
+
+    <div class="form-group" style="grid-column: 1 / -1;">
+        <label asp-for="Email" class="form-label">Email Address</label>
+        <input asp-for="Email" class="form-control" placeholder="Enter email address..." />
+        <span asp-validation-for="Email" class="text-danger"></span>
     </div>
 </div>

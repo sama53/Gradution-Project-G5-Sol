@@ -3,64 +3,127 @@
     ViewData["Title"] = "Grade Details";
 }
 
-<h1><i class="fas fa-info-circle"></i> Grade Details</h1>
-<hr />
+<style>
+    :root {
+        --primary: #2563eb; --primary-light: #eff6ff;
+        --accent: #f59e0b; --accent-dark: #d97706;
+        --border: #e2e8f0; --text: #0f172a; --text-muted: #64748b;
+        --surface: #ffffff; --radius: 14px; --radius-sm: 8px;
+        --shadow-md: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .page-wrapper { max-width: 680px; margin: 2.5rem auto; padding: 0 1.5rem; font-family: 'Segoe UI', system-ui, sans-serif; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 2px solid var(--border); }
+    .page-title { font-size: 1.8rem; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 0.75rem; }
+    .page-title i { color: var(--primary); }
+    .details-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-md); border: 1px solid var(--border); overflow: hidden; }
 
-<div class="row">
-    <div class="col-md-6">
-        <dl class="row">
-            <dt class="col-sm-4">Trainee:</dt>
-            <dd class="col-sm-8">@Model.TraineeName</dd>
+    /* Hero Section */
+    .details-hero { background: linear-gradient(135deg, #4f46e5, #7c3aed); padding: 2rem; text-align: center; }
+    .hero-avatar { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: white; font-size: 2rem; border: 3px solid rgba(255,255,255,0.3); }
+    .hero-name { color: white; font-size: 1.3rem; font-weight: 700; margin: 0 0 0.25rem; }
+    .hero-course { color: rgba(255,255,255,0.75); font-size: 0.9rem; margin: 0; }
 
-            <dt class="col-sm-4">Session:</dt>
-            <dd class="col-sm-8">@Model.SessionTitle</dd>
+    .details-body { padding: 2rem; }
+    .detail-row { display: flex; padding: 1rem 0; border-bottom: 1px solid var(--border); align-items: center; gap: 1rem; }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { width: 130px; flex-shrink: 0; font-weight: 700; color: var(--text-muted); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 0.4rem; }
+    .detail-label i { color: var(--primary); }
+    .detail-value { color: var(--text); font-size: 0.98rem; flex: 1; }
 
-            <dt class="col-sm-4">Course:</dt>
-            <dd class="col-sm-8">@Model.CourseName</dd>
+    .badge-grade { display: inline-flex; align-items: center; justify-content: center; padding: 0.35rem 1.2rem; border-radius: 999px; font-size: 1rem; font-weight: 800; }
+    .grade-excellent { background: #dcfce7; color: #16a34a; }
+    .grade-verygood { background: #e0f2fe; color: #0369a1; }
+    .grade-good { background: #fef3c7; color: #d97706; }
+    .grade-fail { background: #fee2e2; color: #dc2626; }
 
-            <dt class="col-sm-4">Grade:</dt>
-            <dd class="col-sm-8">
-                <span class="badge
-                    @(Model.Value >= 85 ? "bg-success" :
-                                            Model.Value >= 75 ? "bg-info" :
-                                            Model.Value >= 50 ? "bg-warning" : "bg-danger")">
-                    @Model.Value
+    .badge-status { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 1rem; border-radius: 999px; font-size: 0.9rem; font-weight: 700; }
+    .status-pass { background: #dcfce7; color: #16a34a; }
+    .status-fail { background: #fee2e2; color: #dc2626; }
+
+    .performance-text { font-weight: 700; display: flex; align-items: center; gap: 0.4rem; }
+    .perf-excellent { color: #16a34a; }
+    .perf-verygood { color: #0369a1; }
+    .perf-good { color: #d97706; }
+    .perf-fail { color: #dc2626; }
+
+    .form-actions { display: flex; gap: 0.75rem; padding: 1.5rem 2rem; background: #f8fafc; border-top: 1px solid var(--border); }
+    .btn-edit { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: white; border: none; padding: 0.65rem 1.5rem; border-radius: var(--radius-sm); font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 12px rgba(245,158,11,0.3); transition: all 0.2s; }
+    .btn-edit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,158,11,0.4); color: white; }
+    .btn-back { background: transparent; color: var(--text-muted); border: 2px solid var(--border); padding: 0.65rem 1.4rem; border-radius: var(--radius-sm); font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s; }
+    .btn-back:hover { border-color: var(--text-muted); color: var(--text); transform: translateY(-1px); }
+</style>
+
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1 class="page-title"><i class="fas fa-info-circle"></i> Grade Details</h1>
+        <a asp-action="Index" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+    </div>
+
+    <div class="details-card">
+        <div class="details-hero">
+            <div class="hero-avatar"><i class="fas fa-graduation-cap"></i></div>
+            <h2 class="hero-name">@Model.TraineeName</h2>
+            <p class="hero-course">@Model.CourseName</p>
+        </div>
+
+        <div class="details-body">
+            <div class="detail-row">
+                <span class="detail-label"><i class="fas fa-user"></i> Trainee</span>
+                <span class="detail-value">@Model.TraineeName</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label"><i class="fas fa-chalkboard"></i> Session</span>
+                <span class="detail-value">@Model.SessionTitle</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label"><i class="fas fa-book"></i> Course</span>
+                <span class="detail-value">@Model.CourseName</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label"><i class="fas fa-star"></i> Grade</span>
+                <span class="detail-value">
+                    <span class="badge-grade @(Model.Value >= 85 ? "grade-excellent" : Model.Value >= 75 ? "grade-verygood" : Model.Value >= 50 ? "grade-good" : "grade-fail")">
+                        @Model.Value / 100
+                    </span>
                 </span>
-            </dd>
-
-            <dt class="col-sm-4">Status:</dt>
-            <dd class="col-sm-8">
-                <span class="badge @(Model.Value >= 50 ? "bg-success" : "bg-danger")">
-                    @(Model.Value >= 50 ? "Pass" : "Fail")
+            </div>
+            <div class="detail-row">
+                <span class="detail-label"><i class="fas fa-check-circle"></i> Status</span>
+                <span class="detail-value">
+                    <span class="badge-status @(Model.Value >= 50 ? "status-pass" : "status-fail")">
+                        <i class="fas @(Model.Value >= 50 ? "fa-check" : "fa-times")"></i>
+                        @(Model.Value >= 50 ? "Pass" : "Fail")
+                    </span>
                 </span>
-            </dd>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label"><i class="fas fa-chart-line"></i> Performance</span>
+                <span class="detail-value">
+                    @if (Model.Value >= 85)
+                    {
+                        <span class="performance-text perf-excellent"><i class="fas fa-trophy"></i> Excellent</span>
+                    }
+                    else if (Model.Value >= 75)
+                    {
+                        <span class="performance-text perf-verygood"><i class="fas fa-thumbs-up"></i> Very Good</span>
+                    }
+                    else if (Model.Value >= 50)
+                    {
+                        <span class="performance-text perf-good"><i class="fas fa-check"></i> Good</span>
+                    }
+                    else
+                    {
+                        <span class="performance-text perf-fail"><i class="fas fa-exclamation-triangle"></i> Needs Improvement</span>
+                    }
+                </span>
+            </div>
+        </div>
 
-            <dt class="col-sm-4">Performance:</dt>
-            <dd class="col-sm-8">
-                @if (Model.Value >= 85)
-                {
-                    <span class="text-success">Excellent</span>
-                }
-                else if (Model.Value >= 75)
-                {
-                    <span class="text-info">Very Good</span>
-                }
-                else if (Model.Value >= 50)
-                {
-                    <span class="text-warning">Good</span>
-                }
-                else
-                {
-                    <span class="text-danger">Needs Improvement</span>
-                }
-            </dd>
-        </dl>
-
-        <div class="mt-3">
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
-                <i class="fas fa-edit"></i> Edit
+        <div class="form-actions">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn-edit">
+                <i class="fas fa-edit"></i> Edit Grade
             </a>
-            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            <a asp-action="Index" class="btn-back"><i class="fas fa-arrow-left"></i> Back to List</a>
         </div>
     </div>
 </div>

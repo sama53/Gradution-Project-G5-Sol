@@ -1,40 +1,48 @@
-﻿@model Gradution_Project_G5.BLL.ViewModels.CoursesVM.CourseCreateVM
+﻿@* ===== _CourseForm.cshtml ===== *@
+@model Gradution_Project_G5.BLL.ViewModels.CoursesVM.CourseCreateVM
 
-<div class="row">
-    <div class="col-md-6">
-        <div class="form-group">
-            <label asp-for="Name" class="control-label"></label>
-            <input asp-for="Name" class="form-control" />
-            <span asp-validation-for="Name" class="text-danger"></span>
-        </div>
+<style>
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .form-group { margin-bottom: 0; }
+    .form-label { display: block; font-weight: 600; color: #0f172a; margin-bottom: 0.5rem; font-size: 0.9rem; }
+    .form-control { width: 100%; padding: 0.65rem 1rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; color: #0f172a; transition: all 0.2s; background: #f8fafc; box-sizing: border-box; }
+    .form-control:focus { outline: none; border-color: #2563eb; background: white; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    textarea.form-control { resize: vertical; min-height: 90px; }
+    .text-danger { color: #ef4444; font-size: 0.82rem; margin-top: 0.3rem; display: block; }
+    @@media (max-width: 600px) { .form-grid-2 { grid-template-columns: 1fr; } }
+</style>
 
-        <div class="form-group">
-            <label asp-for="Category" class="control-label"></label>
-            <select asp-for="Category" class="form-control"
-                    asp-items="Html.GetEnumSelectList<Gradution_Project_G5.DAL.Models.Categories>()">
-                <option value="">Select Category</option>
-            </select>
-            <span asp-validation-for="Category" class="text-danger"></span>
-        </div>
+<div class="form-grid-2">
+    <div class="form-group">
+        <label asp-for="Name" class="form-label">Course Name</label>
+        <input asp-for="Name" class="form-control" placeholder="Enter course name..." />
+        <span asp-validation-for="Name" class="text-danger"></span>
     </div>
 
-    <div class="col-md-6">
-        <div class="form-group">
-            <label asp-for="Description" class="control-label"></label>
-            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-            <span asp-validation-for="Description" class="text-danger"></span>
-        </div>
+    <div class="form-group">
+        <label asp-for="Category" class="form-label">Category</label>
+        <select asp-for="Category" class="form-control"
+                asp-items="Html.GetEnumSelectList<Gradution_Project_G5.DAL.Models.Categories>()">
+            <option value="">Select Category</option>
+        </select>
+        <span asp-validation-for="Category" class="text-danger"></span>
+    </div>
 
-        <div class="form-group">
-            <label asp-for="InstructorId" class="control-label">Instructor</label>
-            <select asp-for="InstructorId" class="form-control">
-                <option value="">Select Instructor</option>
-                @foreach (var instructor in ViewBag.Instructors as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)
-                {
-                    <option value="@instructor.Value">@instructor.Text</option>
-                }
-            </select>
-            <span asp-validation-for="InstructorId" class="text-danger"></span>
-        </div>
+    <div class="form-group" style="grid-column: 1 / -1;">
+        <label asp-for="Description" class="form-label">Description</label>
+        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Enter course description..."></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="InstructorId" class="form-label">Instructor</label>
+        <select asp-for="InstructorId" class="form-control">
+            <option value="">Select Instructor</option>
+            @foreach (var instructor in ViewBag.Instructors as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)
+            {
+                <option value="@instructor.Value">@instructor.Text</option>
+            }
+        </select>
+        <span asp-validation-for="InstructorId" class="text-danger"></span>
     </div>
 </div>

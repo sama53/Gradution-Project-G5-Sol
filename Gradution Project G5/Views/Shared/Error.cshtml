@@ -1,15 +1,42 @@
-﻿
+﻿@* ===== Error.cshtml ===== *@
 @{
     ViewData["Title"] = "Error";
 }
 
-<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
+<style>
+    .error-wrapper { max-width: 600px; margin: 4rem auto; text-align: center; font-family: 'Segoe UI', system-ui, sans-serif; }
+    .error-icon { font-size: 5rem; color: #ef4444; margin-bottom: 1.5rem; }
+    .error-title { font-size: 2rem; font-weight: 800; color: #0f172a; margin-bottom: 0.5rem; }
+    .error-subtitle { color: #64748b; font-size: 1.05rem; margin-bottom: 2rem; }
+    .error-card { background: white; border-radius: 14px; padding: 1.5rem 2rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 16px rgba(0,0,0,0.08); text-align: left; margin-bottom: 2rem; }
+    .error-card h3 { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 0.75rem; }
+    .request-id { font-family: monospace; background: #f1f5f9; padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.9rem; color: #0f172a; }
+    .btn-home { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; border: none; padding: 0.75rem 2rem; border-radius: 10px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 12px rgba(37,99,235,0.3); transition: all 0.2s; }
+    .btn-home:hover { transform: translateY(-2px); color: white; box-shadow: 0 6px 20px rgba(37,99,235,0.4); }
+</style>
 
-@if (Model.ShowRequestId)
-{
-    <p><strong>Request ID:</strong> <code>@Model.RequestId</code></p>
-}
+<div class="error-wrapper">
+    <div class="error-icon"><i class="fas fa-exclamation-triangle"></i></div>
+    <h1 class="error-title">Something went wrong</h1>
+    <p class="error-subtitle">An error occurred while processing your request.</p>
 
-<h3>Development Mode</h3>
-<p>Swapping to <strong>Development</strong> environment will display more detailed information about the error that occurred.</p>
+    @if (Model?.ShowRequestId == true)
+    {
+        <div class="error-card">
+            <h3>Request ID</h3>
+            <code class="request-id">@Model.RequestId</code>
+        </div>
+    }
+
+    <div class="error-card">
+        <h3>What to do?</h3>
+        <p style="color:#64748b;margin:0;font-size:0.95rem;">
+            Switch to <strong>Development</strong> environment to see more details about the error.
+            Check your <code>appsettings.json</code> or environment variables.
+        </p>
+    </div>
+
+    <a asp-controller="Home" asp-action="Index" class="btn-home">
+        <i class="fas fa-home"></i> Back to Home
+    </a>
+</div>

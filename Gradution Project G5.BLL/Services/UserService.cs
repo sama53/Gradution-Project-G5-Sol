@@ -18,7 +18,30 @@ namespace Gradution_Project_G5.BLL.Services
             _unitOfWork = unitOfWork;
             _logger = logger;
         }
+        public async Task<Result<UserVM>> GetInstructorAsUserAsync(int id)
+        {
+            try
+            {
+                var instructor = await _unitOfWork.Instructors.GetByIdAsync(id);
+                if (instructor == null)
+                    return ResultHelper.Failure<UserVM>("Instructor not found");
 
+                return ResultHelper.Success(new UserVM
+                {
+                    Id = instructor.Id,
+                    Name = $"{instructor.FirstName} {instructor.LastName}",
+                    Email = instructor.Email,
+                    Role = UserRole.Instructor,
+                    IsActive = instructor.IsActive,
+                    IsInstructor = true
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting instructor as user: {Id}", id);
+                return ResultHelper.Failure<UserVM>("An error occurred");
+            }
+        }
         public async Task<Result<UserVM>> GetUserByIdAsync(int id)
         {
             try
@@ -37,37 +60,50 @@ namespace Gradution_Project_G5.BLL.Services
             }
         }
 
-        public async Task<Result<PagedResult<UserVM>>> GetAllUsersAsync(int page = 1, int pageSize = 10)
+        public async Task<Result<PagedResult<UserVM>>> GetAllUsersAsync(int page = 1, int pageSize = 5)
         {
             try
             {
                 var users = await _unitOfWork.Users.GetAllAsync();
                 var activeUsers = users.Where(u => u.IsActive).ToList();
-                var totalCount = activeUsers.Count;
 
-                var pagedUsers = activeUsers
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
-                    .Select(MapToVM);
+                var instructors = await _unitOfWork.Instructors.GetAllAsync();
+                var activeInstructors = instructors.Where(i => i.IsActive).ToList();
+
+                var instructorVMs = activeInstructors.Select(i => new UserVM
+                {
+                    Id = i.Id,
+                    Name = $"{i.FirstName} {i.LastName}",
+                    Email = i.Email,
+                    Role = UserRole.Instructor,
+                    IsActive = i.IsActive,
+                    IsInstructor = true 
+                }).ToList();
+
+                var allVMs = activeUsers.Select(MapToVM)
+                    .Concat(instructorVMs)
+                    .ToList();
+
+                var totalCount = allVMs.Count;
 
                 var pagedResult = new PagedResult<UserVM>
                 {
-                    Items = pagedUsers,
+                    Items = allVMs.Skip((page - 1) * pageSize).Take(pageSize),
                     TotalCount = totalCount,
                     PageNumber = page,
                     PageSize = pageSize
                 };
 
-                return ResultHelper.Success(pagedResult); 
+                return ResultHelper.Success(pagedResult);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting all users");
-                return ResultHelper.Failure<PagedResult<UserVM>>("An error occurred while retrieving users"); 
+                return ResultHelper.Failure<PagedResult<UserVM>>("An error occurred while retrieving users");
             }
         }
 
-        public async Task<Result<PagedResult<UserVM>>> GetUsersByRoleAsync(string role, int page = 1, int pageSize = 10)
+        public async Task<Result<PagedResult<UserVM>>> GetUsersByRoleAsync(string role, int page = 1, int pageSize = 5)
         {
             try
             {
@@ -99,7 +135,7 @@ namespace Gradution_Project_G5.BLL.Services
             }
         }
 
-        public async Task<Result<PagedResult<UserVM>>> SearchUsersAsync(string searchTerm, int page = 1, int pageSize = 10)
+        public async Task<Result<PagedResult<UserVM>>> SearchUsersAsync(string searchTerm, int page = 1, int pageSize = 5)
         {
             try
             {
@@ -138,10 +174,34 @@ namespace Gradution_Project_G5.BLL.Services
         {
             try
             {
-              
                 var isUnique = await _unitOfWork.Users.IsEmailUniqueAsync(createVM.Email);
                 if (!isUnique)
-                    return ResultHelper.Failure<UserVM>("Email already exists"); 
+                    return ResultHelper.Failure<UserVM>("Email already exists");
+
+                if (createVM.Role == UserRole.Instructor)
+                {
+                    var nameParts = createVM.Name.Trim().Split(' ', 2);
+                    var instructor = new Instructor
+                    {
+                        FirstName = nameParts[0],
+                        LastName = nameParts.Length > 1 ? nameParts[1] : "",
+                        Email = createVM.Email,
+                        Specialization = Specialization.SoftwareDevelopment,
+                        IsActive = true
+                    };
+
+                    await _unitOfWork.Instructors.AddAsync(instructor);
+                    await _unitOfWork.SaveChangesAsync();
+
+                    return ResultHelper.Success(new UserVM
+                    {
+                        Id = instructor.Id,
+                        Name = $"{instructor.FirstName} {instructor.LastName}",
+                        Email = instructor.Email,
+                        Role = UserRole.Instructor,
+                        IsActive = instructor.IsActive
+                    });
+                }
 
                 var user = new User
                 {
@@ -154,13 +214,12 @@ namespace Gradution_Project_G5.BLL.Services
                 await _unitOfWork.Users.AddAsync(user);
                 await _unitOfWork.SaveChangesAsync();
 
-                var userVM = MapToVM(user);
-                return ResultHelper.Success(userVM); 
+                return ResultHelper.Success(MapToVM(user));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating user");
-                return ResultHelper.Failure<UserVM>("An error occurred while creating the user"); 
+                return ResultHelper.Failure<UserVM>("An error occurred while creating the user");
             }
         }
 
@@ -168,14 +227,43 @@ namespace Gradution_Project_G5.BLL.Services
         {
             try
             {
+                if (editVM.IsInstructor)
+                {
+                    var instructor = await _unitOfWork.Instructors.GetByIdAsync(id);
+                    if (instructor == null)
+                        return ResultHelper.Failure<UserVM>("Instructor not found");
+
+                    var isInstructorEmailUnique = await _unitOfWork.Instructors.IsEmailUniqueAsync(editVM.Email, id);
+                    if (!isInstructorEmailUnique)
+                        return ResultHelper.Failure<UserVM>("Email already exists");
+
+                    var nameParts = editVM.Name.Trim().Split(' ', 2);
+                    instructor.FirstName = nameParts[0];
+                    instructor.LastName = nameParts.Length > 1 ? nameParts[1] : "";
+                    instructor.Email = editVM.Email;
+
+                    _unitOfWork.Instructors.Update(instructor);
+                    await _unitOfWork.SaveChangesAsync();
+
+                    return ResultHelper.Success(new UserVM
+                    {
+                        Id = instructor.Id,
+                        Name = $"{instructor.FirstName} {instructor.LastName}",
+                        Email = instructor.Email,
+                        Role = UserRole.Instructor,
+                        IsActive = instructor.IsActive,
+                        IsInstructor = true
+                    });
+                }
+
+                // باقي الـ Users عادي
                 var user = await _unitOfWork.Users.GetByIdAsync(id);
                 if (user == null)
-                    return ResultHelper.Failure<UserVM>("User not found"); 
+                    return ResultHelper.Failure<UserVM>("User not found");
 
-                
                 var isUnique = await _unitOfWork.Users.IsEmailUniqueAsync(editVM.Email, id);
                 if (!isUnique)
-                    return ResultHelper.Failure<UserVM>("Email already exists"); 
+                    return ResultHelper.Failure<UserVM>("Email already exists");
 
                 user.Name = editVM.Name;
                 user.Email = editVM.Email;
@@ -184,8 +272,7 @@ namespace Gradution_Project_G5.BLL.Services
                 _unitOfWork.Users.Update(user);
                 await _unitOfWork.SaveChangesAsync();
 
-                var userVM = MapToVM(user);
-                return ResultHelper.Success(userVM); 
+                return ResultHelper.Success(MapToVM(user));
             }
             catch (Exception ex)
             {
@@ -193,33 +280,68 @@ namespace Gradution_Project_G5.BLL.Services
                 return ResultHelper.Failure<UserVM>("An error occurred while updating the user");
             }
         }
+        public async Task<Result<bool>> DeleteInstructorAsync(int id)
+        {
+            try
+            {
+                var instructor = await _unitOfWork.Instructors.GetByIdAsync(id);
+                if (instructor == null)
+                    return ResultHelper.Failure<bool>("Instructor not found");
 
+                // Unassign instructor from all related courses
+                var courses = await _unitOfWork.Courses.FindAsync(c => c.InstructorId == id);
+                foreach (var course in courses)
+                {
+                    course.InstructorId = null;
+                    _unitOfWork.Courses.Update(course);
+                }
+
+                instructor.IsActive = false;
+                _unitOfWork.Instructors.Update(instructor);
+                await _unitOfWork.SaveChangesAsync();
+
+                return ResultHelper.Success(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting instructor with ID: {Id}", id);
+                return ResultHelper.Failure<bool>("An error occurred while deleting the instructor");
+            }
+        }
         public async Task<Result<bool>> DeleteUserAsync(int id)
         {
             try
             {
                 var user = await _unitOfWork.Users.GetByIdAsync(id);
                 if (user == null)
-                    return ResultHelper.Failure<bool>("User not found"); 
+                    return ResultHelper.Failure<bool>("User not found");
 
-              
+                if (user.Role == UserRole.Trainee)
+                {
+                    var grades = await _unitOfWork.Grades.GetByTraineeIdAsync(id);
+                    foreach (var grade in grades)
+                        _unitOfWork.Grades.Delete(grade);
+                }
+
                 user.IsActive = false;
                 _unitOfWork.Users.Update(user);
                 await _unitOfWork.SaveChangesAsync();
 
-                return ResultHelper.Success(true); 
+                return ResultHelper.Success(true);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting user with ID: {Id}", id);
-                return ResultHelper.Failure<bool>("An error occurred while deleting the user"); 
+                return ResultHelper.Failure<bool>("An error occurred while deleting the user");
             }
         }
 
         public async Task<Result<bool>> IsEmailUniqueAsync(string email, int? excludeId = null)
         {
+
             try
             {
+
                 var isUnique = await _unitOfWork.Users.IsEmailUniqueAsync(email, excludeId);
                 return ResultHelper.Success(isUnique); 
             }

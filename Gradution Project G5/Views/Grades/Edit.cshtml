@@ -3,36 +3,69 @@
     ViewData["Title"] = "Edit Grade";
 }
 
-<h1><i class="fas fa-edit"></i> Edit Grade</h1>
-<hr />
+<style>
+    :root {
+        --primary: #2563eb;
+        --accent: #f59e0b; --accent-dark: #d97706;
+        --border: #e2e8f0; --text: #0f172a; --text-muted: #64748b;
+        --surface: #ffffff; --radius: 14px; --radius-sm: 8px;
+        --shadow-md: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .page-wrapper { max-width: 600px; margin: 2.5rem auto; padding: 0 1.5rem; font-family: 'Segoe UI', system-ui, sans-serif; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 2px solid var(--border); }
+    .page-title { font-size: 1.8rem; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 0.75rem; }
+    .page-title i { color: var(--accent); }
+    .form-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-md); border: 1px solid var(--border); padding: 2rem; }
+    .form-group { margin-bottom: 1.5rem; }
+    .form-label { display: flex; align-items: center; gap: 0.4rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; font-size: 0.9rem; }
+    .form-label i { color: var(--primary); }
+    .form-control { width: 100%; padding: 0.65rem 1rem; border: 2px solid var(--border); border-radius: var(--radius-sm); font-size: 0.95rem; color: var(--text); transition: all 0.2s; background: #f8fafc; box-sizing: border-box; }
+    .form-control:focus { outline: none; border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .grade-scale { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
+    .scale-badge { padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
+    .scale-excellent { background: #dcfce7; color: #16a34a; }
+    .scale-verygood { background: #e0f2fe; color: #0369a1; }
+    .scale-good { background: #fef3c7; color: #d97706; }
+    .scale-fail { background: #fee2e2; color: #dc2626; }
+    .text-danger { color: #ef4444; font-size: 0.82rem; margin-top: 0.3rem; display: block; }
+    .form-actions { display: flex; gap: 0.75rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+    .btn-submit { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: white; border: none; padding: 0.7rem 1.8rem; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 12px rgba(245,158,11,0.3); transition: all 0.2s; }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,158,11,0.4); }
+    .btn-back { background: transparent; color: var(--text-muted); border: 2px solid var(--border); padding: 0.7rem 1.4rem; border-radius: var(--radius-sm); font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s; }
+    .btn-back:hover { border-color: var(--text-muted); color: var(--text); transform: translateY(-1px); }
+</style>
 
-<div class="row">
-    <div class="col-md-6">
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1 class="page-title"><i class="fas fa-edit"></i> Edit Grade</h1>
+        <a asp-action="Index" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+    </div>
+
+    <div class="form-card">
         <form asp-action="Edit">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Id" />
 
             <div class="form-group">
-                <label asp-for="Value" class="control-label">Grade Value (0-100)</label>
-                <input asp-for="Value" type="number" class="form-control" min="0" max="100" />
+                <label asp-for="Value" class="form-label"><i class="fas fa-star"></i> Grade Value (0-100)</label>
+                <input asp-for="Value" type="number" class="form-control" min="0" max="100" placeholder="Enter grade value..." />
                 <span asp-validation-for="Value" class="text-danger"></span>
-                <small class="form-text text-muted">
-                    Grade scale: 85-100 (Excellent), 75-84 (Very Good), 50-74 (Good), 0-49 (Fail)
-                </small>
+                <div class="grade-scale">
+                    <span class="scale-badge scale-excellent">85-100 Excellent</span>
+                    <span class="scale-badge scale-verygood">75-84 Very Good</span>
+                    <span class="scale-badge scale-good">50-74 Good</span>
+                    <span class="scale-badge scale-fail">0-49 Fail</span>
+                </div>
             </div>
 
-            <div class="form-group mt-3">
-                <button type="submit" class="btn btn-warning">
-                    <i class="fas fa-save"></i> Update
-                </button>
-                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            <div class="form-actions">
+                <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Update Grade</button>
+                <a asp-action="Index" class="btn-back"><i class="fas fa-times"></i> Cancel</a>
             </div>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

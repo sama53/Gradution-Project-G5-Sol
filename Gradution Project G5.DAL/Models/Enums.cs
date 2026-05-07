@@ -4,7 +4,15 @@
     {
         UI,
         DVops,
-        Datascience
+        DataScience,
+        Backend,
+        Frontend,
+        AI,
+        Database,
+        Flutter,
+        DataAnalysis,
+        CyperSecurity
+
     }
 
     public enum Specialization

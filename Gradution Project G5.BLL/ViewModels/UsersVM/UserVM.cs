@@ -9,5 +9,7 @@ namespace Gradution_Project_G5.BLL.ViewModels.UsersVM
         public string Email { get; set; } = string.Empty;
         public UserRole Role { get; set; }
         public bool IsActive { get; set; }
+
+        public bool IsInstructor { get; set; } = false;
     }
 }

@@ -3,91 +3,369 @@
     ViewData["Title"] = "Users";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="fas fa-users"></i> Users</h1>
-    <a asp-action="Create" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Create New
-    </a>
-</div>
+<style>
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --primary-light: #eff6ff;
+        --accent: #f59e0b;
+        --accent-dark: #d97706;
+        --danger: #ef4444;
+        --danger-dark: #dc2626;
+        --info: #06b6d4;
+        --info-dark: #0891b2;
+        --success: #10b981;
+        --surface: #ffffff;
+        --border: #e2e8f0;
+        --text: #0f172a;
+        --text-muted: #64748b;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+        --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+        --radius: 14px;
+        --radius-sm: 8px;
+    }
 
-<!-- Search and Filter Form -->
-<form asp-action="Index" method="get" class="mb-4">
-    <div class="input-group">
-        <input type="text" class="form-control" name="searchTerm" value="@ViewBag.CurrentFilter"
-               placeholder="Search by name or email.">
-        <button class="btn btn-outline-secondary" type="submit">
-            <i class="fas fa-search"></i> Search
-        </button>
-        <a asp-action="Index" class="btn btn-outline-danger">Clear</a>
+    .page-wrapper {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 2.5rem 1.5rem;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid var(--border);
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        letter-spacing: -0.5px;
+    }
+
+    .page-title i { color: var(--primary); font-size: 1.8rem; }
+
+    .btn-create {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border: none;
+        padding: 0.65rem 1.5rem;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+        transition: all 0.2s ease;
+    }
+
+    .btn-create:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(37,99,235,0.4);
+        color: white;
+    }
+
+    .search-bar {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        background: var(--surface);
+        border: 2px solid var(--border);
+        border-radius: var(--radius);
+        padding: 0.4rem 0.4rem 0.4rem 1rem;
+        box-shadow: var(--shadow-sm);
+        transition: border-color 0.2s;
+    }
+
+    .search-bar:focus-within {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+
+    .search-bar input {
+        border: none;
+        outline: none;
+        flex: 1;
+        font-size: 0.95rem;
+        color: var(--text);
+        background: transparent;
+    }
+
+    .search-bar input::placeholder { color: var(--text-muted); }
+
+    .btn-search {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 0.5rem 1.2rem;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: all 0.2s;
+    }
+
+    .btn-search:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+    .btn-clear {
+        background: transparent;
+        color: var(--danger);
+        border: 2px solid var(--danger);
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: all 0.2s;
+    }
+
+    .btn-clear:hover { background: var(--danger); color: white; transform: translateY(-1px); }
+
+    .table-card {
+        background: var(--surface);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
+
+    .users-table { width: 100%; border-collapse: collapse; }
+
+    .users-table thead {
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+    }
+
+    .users-table thead th {
+        padding: 1rem 1.25rem;
+        color: #94a3b8;
+        font-weight: 600;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: none;
+    }
+
+    .users-table thead th:first-child { color: white; }
+
+    .users-table tbody tr {
+        border-bottom: 1px solid var(--border);
+        transition: background 0.15s;
+    }
+
+    .users-table tbody tr:last-child { border-bottom: none; }
+    .users-table tbody tr:hover { background: var(--primary-light); }
+
+    .users-table tbody td {
+        padding: 1rem 1.25rem;
+        color: var(--text);
+        font-size: 0.95rem;
+        vertical-align: middle;
+    }
+
+    .user-name {
+        font-weight: 700;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .user-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+    }
+
+    .user-email { color: var(--text-muted); font-size: 0.9rem; }
+
+    .badge-role {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+    }
+
+    .badge-admin { background: #fee2e2; color: #dc2626; }
+    .badge-instructor { background: #fef3c7; color: #d97706; }
+    .badge-trainee { background: #e0f2fe; color: #0284c7; }
+
+    .actions-cell { display: flex; gap: 0.4rem; align-items: center; }
+
+    .btn-action {
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-sm);
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    .btn-action:active { transform: translateY(0); }
+
+    .btn-view { background: linear-gradient(135deg, var(--info), var(--info-dark)); color: white; }
+    .btn-edit { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: white; }
+    .btn-delete { background: linear-gradient(135deg, var(--danger), var(--danger-dark)); color: white; }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--surface);
+        border-radius: var(--radius);
+        border: 2px dashed var(--border);
+    }
+
+    .empty-state i { font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem; display: block; }
+    .empty-state p { color: var(--text-muted); font-size: 1.05rem; margin: 0; }
+
+    .pagination-wrapper { display: flex; justify-content: center; margin-top: 1.5rem; gap: 0.3rem; }
+
+    .page-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: var(--radius-sm);
+        border: 2px solid var(--border);
+        background: var(--surface);
+        color: var(--text);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.2s;
+        font-size: 0.9rem;
+    }
+
+    .page-btn:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-1px); }
+    .page-btn.active { background: var(--primary); border-color: var(--primary); color: white; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+</style>
+
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-users"></i> Users
+        </h1>
+        <a asp-action="Create" class="btn-create">
+            <i class="fas fa-plus"></i> Create New
+        </a>
     </div>
-</form>
 
-@if (Model != null && Model.Items != null && Model.Items.Any())
-{
-    <div class="table-responsive">
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Items)
-                {
-                    <tr>
-                        <td>@item.Name</td>
-                        <td>@item.Email</td>
-                        <td>
-                            <span class="badge
-                                        @(item.Role.ToString() == "Admin" ? "bg-danger" :
-                                                                    item.Role.ToString() == "Instructor" ? "bg-warning" : "bg-info")">
-                        @item.Role
-                    </span>
-                </td>
-                <td class="table-actions">
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <form asp-action="Delete" method="post" class="d-inline">
-                        <input type="hidden" name="id" value="@item.Id" />
-                        <button type="submit" class="btn btn-danger btn-sm"
-                                onclick="return confirm('Are you sure you want to delete this user?')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </form>
-                </td>
-            </tr>
-                        }
-            </tbody>
-        </table>
-    </div>
+    <form asp-action="Index" method="get">
+        <div class="search-bar">
+            <i class="fas fa-search" style="color:var(--text-muted); align-self:center;"></i>
+            <input type="text" name="searchTerm" value="@ViewBag.CurrentFilter" placeholder="Search by name or email..." />
+            <button class="btn-search" type="submit"><i class="fas fa-search"></i> Search</button>
+            <a asp-action="Index" class="btn-clear"><i class="fas fa-times"></i> Clear</a>
+        </div>
+    </form>
 
-    <!-- Pagination -->
-    @if (Model.TotalPages > 1)
+    @if (Model != null && Model.Items != null && Model.Items.Any())
     {
-        <nav>
-            <ul class="pagination">
+        <div class="table-card">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                <div class="user-name">
+                                    <div class="user-avatar">@item.Name.First()</div>
+                                    @item.Name
+                                </div>
+                            </td>
+                            <td><span class="user-email">@item.Email</span></td>
+                            <td>
+                                <span class="badge-role @(item.Role.ToString() == "Admin" ? "badge-admin" : item.Role.ToString() == "Instructor" ? "badge-instructor" : "badge-trainee")">
+                                    <i class="fas @(item.Role.ToString() == "Admin" ? "fa-shield-alt" : item.Role.ToString() == "Instructor" ? "fa-chalkboard-teacher" : "fa-user-graduate")"></i>
+                                    @item.Role
+                                </span>
+                            </td>
+                            <td>
+                                <div class="actions-cell">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn-action btn-view" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id"
+                                       asp-route-isInstructor="@item.IsInstructor"
+                                       class="btn-action btn-edit" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form asp-action="Delete" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <input type="hidden" name="isInstructor" value="@(item.IsInstructor ? "true" : "false")" />
+                                        <button type="submit" class="btn-action btn-delete" title="Delete"
+                                                onclick="return confirm('Are you sure you want to delete this user?')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <div class="pagination-wrapper">
                 @for (int i = 1; i <= Model.TotalPages; i++)
                 {
-                    <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                        <a class="page-link" href="@Url.Action("Index", new { page = i, pageSize = Model.PageSize, searchTerm = ViewBag.CurrentFilter, role = ViewBag.CurrentRole })">
-                            @i
-                        </a>
-                    </li>
+                    <a class="page-btn @(i == Model.PageNumber ? "active" : "")"
+                       href="@Url.Action("Index", new { page = i, pageSize = Model.PageSize, searchTerm = ViewBag.CurrentFilter, role = ViewBag.CurrentRole })">
+                        @i
+                    </a>
                 }
-            </ul>
-        </nav>
+            </div>
+        }
     }
-}
-else
-{
-    <div class="alert alert-warning text-center">
-        <i class="fas fa-exclamation-triangle"></i> No users found.
-    </div>
-}
+    else
+    {
+        <div class="empty-state">
+            <i class="fas fa-users-slash"></i>
+            <p>No users found.</p>
+        </div>
+    }
+</div>
