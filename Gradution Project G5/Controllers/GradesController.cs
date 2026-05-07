@@ -21,7 +21,7 @@ namespace Gradution_Project_G5.UI.Controllers
         }
 
         // GET: Grades
-        public async Task<IActionResult> Index(int? sessionId, int? traineeId, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> Index(int? sessionId, int? traineeId, int page = 1, int pageSize = 5)
         {
             ViewBag.SessionId = sessionId;
             ViewBag.TraineeId = traineeId;

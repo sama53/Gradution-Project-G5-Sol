@@ -42,7 +42,6 @@ public class Session
         public DateTime StartDate { get; set; }
 
         [Required]
-        [MinDuration(ErrorMessage = "Session duration must be at least 1 hour.")]
         public DateTime EndDate { get; set; }
 
         [Required]

@@ -37,7 +37,7 @@ namespace Gradution_Project_G5.BLL.Services
             }
         }
 
-        public async Task<Result<PagedResult<GradeVM>>> GetGradesBySessionAsync(int sessionId, int page = 1, int pageSize = 10)
+        public async Task<Result<PagedResult<GradeVM>>> GetGradesBySessionAsync(int sessionId, int page = 1, int pageSize = 5)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace Gradution_Project_G5.BLL.Services
             }
         }
 
-        public async Task<Result<PagedResult<GradeVM>>> GetGradesByTraineeAsync(int traineeId, int page = 1, int pageSize = 10)
+        public async Task<Result<PagedResult<GradeVM>>> GetGradesByTraineeAsync(int traineeId, int page = 1, int pageSize = 5)
         {
             try
             {
@@ -208,7 +208,7 @@ namespace Gradution_Project_G5.BLL.Services
             };
         }
 
-        public async Task<Result<PagedResult<GradeVM>>> GetAllGradesAsync(int page = 1, int pageSize = 10)
+        public async Task<Result<PagedResult<GradeVM>>> GetAllGradesAsync(int page = 1, int pageSize = 5)
         {
             try
             {
