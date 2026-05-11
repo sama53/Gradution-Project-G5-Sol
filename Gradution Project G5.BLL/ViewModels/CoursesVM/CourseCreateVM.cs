@@ -8,9 +8,7 @@ namespace Gradution_Project_G5.BLL.ViewModels.CoursesVM
     {
         [Required(ErrorMessage = "Course name is required")]
         [StringLength(50, MinimumLength = 2, ErrorMessage = "Name must be between 2 and 50 characters")]
-        [NoNumber(ErrorMessage = "Course name cannot contain numbers")]
-        [NoSpecialCharacters(ErrorMessage = "Course name cannot contain special characters")]
-        public string Name { get; set; } = string.Empty;
+        [NotOnlyNumbersAndSpecialChars(ErrorMessage = "Course name must contain at least one letter")] public string Name { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Description is required")]
         [StringLength(200, ErrorMessage = "Description cannot exceed 200 characters")]

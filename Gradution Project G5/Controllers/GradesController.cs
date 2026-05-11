@@ -106,6 +106,15 @@ namespace Gradution_Project_G5.UI.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Check duplicate before calling service
+                var existing = await _gradeService.GetGradesBySessionAsync(gradeVM.SessionId, 1, int.MaxValue);
+                if (existing.Success && existing.Data.Items.Any(g => g.TraineeId == gradeVM.TraineeId))
+                {
+                    ModelState.AddModelError("", "Grade already assigned for this trainee in the selected session.");
+                    await LoadViewData();
+                    return View(gradeVM);
+                }
+
                 var result = await _gradeService.CreateGradeAsync(gradeVM);
                 if (result.Success)
                 {
@@ -113,7 +122,7 @@ namespace Gradution_Project_G5.UI.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                TempData["Error"] = result.Message;
+                ModelState.AddModelError("", result.Message);
             }
 
             await LoadViewData();

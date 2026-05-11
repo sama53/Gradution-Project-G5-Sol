@@ -139,29 +139,46 @@ namespace Gradution_Project_G5.BLL.Services
         {
             try
             {
+
                 var allUsers = await _unitOfWork.Users.GetAllAsync();
+                var allInstructors = await _unitOfWork.Instructors.GetAllAsync();
+
                 var filteredUsers = allUsers
                     .Where(u => u.IsActive &&
-                               (u.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                               (string.IsNullOrEmpty(searchTerm) ||
+                                u.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                                 u.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                                u.Role.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)));
-
-                var totalCount = filteredUsers.Count();
-
-                var pagedUsers = filteredUsers
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
+                                u.Role.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)))
                     .Select(MapToVM);
+
+                var filteredInstructors = allInstructors
+                    .Where(i => i.IsActive &&
+                               (string.IsNullOrEmpty(searchTerm) ||
+                                $"{i.FirstName} {i.LastName}".Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                                i.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                                "Instructor".Contains(searchTerm, StringComparison.OrdinalIgnoreCase)))
+                    .Select(i => new UserVM
+                    {
+                        Id = i.Id,
+                        Name = $"{i.FirstName} {i.LastName}",
+                        Email = i.Email,
+                        Role = UserRole.Instructor,
+                        IsActive = i.IsActive,
+                        IsInstructor = true
+                    });
+
+                var allVMs = filteredUsers.Concat(filteredInstructors).ToList();
+                var totalCount = allVMs.Count;
 
                 var pagedResult = new PagedResult<UserVM>
                 {
-                    Items = pagedUsers,
+                    Items = allVMs.Skip((page - 1) * pageSize).Take(pageSize),
                     TotalCount = totalCount,
                     PageNumber = page,
                     PageSize = pageSize
                 };
 
-                return ResultHelper.Success(pagedResult); 
+                return ResultHelper.Success(pagedResult);
             }
             catch (Exception ex)
             {
@@ -174,17 +191,43 @@ namespace Gradution_Project_G5.BLL.Services
         {
             try
             {
-                var isUnique = await _unitOfWork.Users.IsEmailUniqueAsync(createVM.Email);
-                if (!isUnique)
-                    return ResultHelper.Failure<UserVM>("Email already exists");
-
                 if (createVM.Role == UserRole.Instructor)
                 {
-                    var nameParts = createVM.Name.Trim().Split(' ', 2);
+                    // Check if exists (even inactive)
+                    var isUniqueInUsersTable = await _unitOfWork.Users.IsEmailUniqueAsync(createVM.Email);
+                    if (!isUniqueInUsersTable)
+                        return ResultHelper.Failure<UserVM>("Email already exists");
+
+                    var allInstructors = await _unitOfWork.Instructors.GetAllAsync();
+                    var existing = allInstructors.FirstOrDefault(i => i.Email == createVM.Email);
+
+                    if (existing != null)
+                    {
+                        // Reactivate instead of creating new
+                        var nameParts = createVM.Name.Trim().Split(' ', 2);
+                        existing.FirstName = nameParts[0];
+                        existing.LastName = nameParts.Length > 1 ? nameParts[1] : "";
+                        existing.IsActive = true;
+
+                        _unitOfWork.Instructors.Update(existing);
+                        await _unitOfWork.SaveChangesAsync();
+
+                        return ResultHelper.Success(new UserVM
+                        {
+                            Id = existing.Id,
+                            Name = $"{existing.FirstName} {existing.LastName}",
+                            Email = existing.Email,
+                            Role = UserRole.Instructor,
+                            IsActive = true,
+                            IsInstructor = true
+                        });
+                    }
+
+                    var parts = createVM.Name.Trim().Split(' ', 2);
                     var instructor = new Instructor
                     {
-                        FirstName = nameParts[0],
-                        LastName = nameParts.Length > 1 ? nameParts[1] : "",
+                        FirstName = parts[0],
+                        LastName = parts.Length > 1 ? parts[1] : "",
                         Email = createVM.Email,
                         Specialization = Specialization.SoftwareDevelopment,
                         IsActive = true
@@ -199,9 +242,17 @@ namespace Gradution_Project_G5.BLL.Services
                         Name = $"{instructor.FirstName} {instructor.LastName}",
                         Email = instructor.Email,
                         Role = UserRole.Instructor,
-                        IsActive = instructor.IsActive
+                        IsActive = true
                     });
                 }
+
+                // Users (non-instructor)
+                var isUniqueInUsers = await _unitOfWork.Users.IsEmailUniqueAsync(createVM.Email);
+                var allInstructorsList = await _unitOfWork.Instructors.GetAllAsync();
+                var existsInInstructors = allInstructorsList.Any(i => i.Email == createVM.Email);
+
+                if (!isUniqueInUsers || existsInInstructors)
+                    return ResultHelper.Failure<UserVM>("Email already exists");
 
                 var user = new User
                 {
@@ -256,7 +307,6 @@ namespace Gradution_Project_G5.BLL.Services
                     });
                 }
 
-                // باقي الـ Users عادي
                 var user = await _unitOfWork.Users.GetByIdAsync(id);
                 if (user == null)
                     return ResultHelper.Failure<UserVM>("User not found");
